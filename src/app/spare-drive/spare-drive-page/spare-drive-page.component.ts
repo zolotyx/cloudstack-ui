@@ -68,7 +68,7 @@ export class SpareDrivePageComponent implements OnInit, OnDestroy {
     private dialogService: DialogService,
     private diskOfferingService: DiskOfferingService,
     private jobsNotificationService: JobsNotificationService,
-    private listService: ListService,
+    public listService: ListService,
     private spareDriveActionsService: SpareDriveActionsService,
     private userService: UserService,
     private volumeService: VolumeService,
@@ -78,9 +78,6 @@ export class SpareDrivePageComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.listService.onAction
-      .takeUntil(this.onDestroy)
-      .subscribe(() => this.showCreationDialog());
 
     this.spareDriveActionsService.onVolumeAttachment
       .takeUntil(this.onDestroy)
