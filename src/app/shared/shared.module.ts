@@ -102,6 +102,7 @@ import { UserService } from './services/user.service';
 import { VolumeOfferingService } from './services/volume-offering.service';
 import { VolumeService } from './services/volume.service';
 import { ZoneService } from './services/zone.service';
+import { FilterService } from './services/filter.service';
 
 @NgModule({
   imports: [
@@ -226,6 +227,7 @@ import { ZoneService } from './services/zone.service';
     DiskOfferingService,
     DiskStorageService,
     ErrorService,
+    FilterService,
     InstanceGroupService,
     JobsNotificationService,
     LanguageService,

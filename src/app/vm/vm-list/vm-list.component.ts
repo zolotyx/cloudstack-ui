@@ -14,13 +14,10 @@ import { VirtualMachine, VmState } from '../shared/vm.model';
 import { VirtualMachineEntityName, VmService } from '../shared/vm.service';
 
 import { VmCreationComponent } from '../vm-creation/vm-creation.component';
-import {
-  InstanceGroupOrNoGroup,
-  noGroup,
-  VmFilter
-} from '../vm-filter/vm-filter.component';
 import { VmListItemComponent } from './vm-list-item.component';
 import * as clone from 'lodash/clone';
+import { InstanceGroupOrNoGroup, noGroup } from '../vm-filter/groups-filter/groups-filter.service';
+import { VmFilter } from '../vm-filter/vm-filter.component';
 
 
 const askToCreateVm = 'csui.user.ask-to-create-vm';

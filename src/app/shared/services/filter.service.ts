@@ -1,16 +1,20 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from './storage.service';
 import { Utils } from './utils.service';
+import { Injectable } from '@angular/core';
 
 export interface FilterConfig {
   [propName: string]: FilterItemConfig;
 }
 
 export interface FilterItemConfig {
-  type: 'array' | 'string' | 'boolean';
+  type: FilterType;
   options?: Array<any>;
   defaultOption?: any;
 }
+
+export type FilterType = 'array' | 'string' | 'boolean';
+
 
 export class FilterService {
   private static setDefaultOrRemove(filter, config: FilterConfig, output): void {
@@ -54,10 +58,8 @@ export class FilterService {
   }
 
   constructor(
-    private config: FilterConfig,
     private router: Router,
     private storage: StorageService,
-    private key: string,
     private activatedRoute: ActivatedRoute) {
   }
 
@@ -79,31 +81,31 @@ export class FilterService {
       .then(() => this.storage.write(key, JSON.stringify(queryParams)));
   }
 
-  public getParams(): any {
+  public getParams(key, config): any {
     const queryParams = this.activatedRoute.snapshot.queryParams;
 
     let storage = {};
     try {
-      storage = JSON.parse(this.storage.read(this.key)) || {};
+      storage = JSON.parse(this.storage.read(key)) || {};
     } catch (e) {
-      this.storage.remove(this.key);
+      this.storage.remove(key);
     }
 
-    return Object.keys(this.config).reduce((memo, filter) => {
+    return Object.keys(config).reduce((memo, filter) => {
       const param = queryParams[filter];
-      if (this.config.hasOwnProperty(filter)) {
-        memo[filter] = FilterService.getValue(param, this.config[filter]);
+      if (config.hasOwnProperty(filter)) {
+        memo[filter] = FilterService.getValue(param, config[filter]);
       }
 
       if (memo[filter] == null && storage.hasOwnProperty(filter)) {
         memo[filter] = FilterService.getValue(
           storage[filter],
-          this.config[filter]
+          config[filter]
         );
       }
 
       if (memo[filter] == null) {
-        FilterService.setDefaultOrRemove(filter, this.config, memo);
+        FilterService.setDefaultOrRemove(filter, config, memo);
       }
 
       return memo;

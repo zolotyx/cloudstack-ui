@@ -16,6 +16,7 @@ import { SpareDrivePageComponent } from './spare-drive-page/spare-drive-page.com
 import { SpareDriveSidebarComponent } from './spare-drive-sidebar/spare-drive-sidebar.component';
 import { spareDrivesRouting } from './spare-drive.routing';
 import { SpareDriveSidebarVolumeComponent } from './spare-drive-sidebar/spare-drive-sidebar-volume/spare-drive-sidebar-volume.component';
+import { SpareDriveFilterComponent } from './spare-drive-filter/spare-drive-filter.component';
 
 
 @NgModule({
@@ -34,6 +35,7 @@ import { SpareDriveSidebarVolumeComponent } from './spare-drive-sidebar/spare-dr
     MdIconModule,
   ],
   declarations: [
+    SpareDriveFilterComponent,
     SpareDrivePageComponent,
     SpareDriveSidebarComponent,
     SpareDriveSidebarVolumeComponent,

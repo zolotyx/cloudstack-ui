@@ -1,54 +1,26 @@
 <div class="options-panel delimiter">
-  <md-select
-    class="filter-select"
-    multiple="true"
-    [placeholder]="'VM_PAGE.FILTERS.SELECT_ZONES' | translate"
+  <cs-zones-filter
+    [zones]="zones"
     [(ngModel)]="selectedZones"
-    (change)="update()"
-  >
-    <md-option *ngFor="let z of zones" [value]="z">{{ z.name }}</md-option>
-  </md-select>
-  <md-select
-    class="filter-select"
-    multiple="true"
-    [placeholder]="'VM_PAGE.FILTERS.SELECT_GROUPS' | translate"
+    (ngModelChange)="update()"
+  ></cs-zones-filter>
+
+  <cs-groups-filter
+    [groups]="groups"
     [(ngModel)]="selectedGroups"
-    (change)="update()"
-  >
-    <md-option *ngIf="showNoGroupFilter" [value]="noGroup">
-      <em>{{ 'VM_PAGE.FILTERS.NO_GROUP' | translate }}</em>
-    </md-option>
+    (ngModelChange)="update()"
+  ></cs-groups-filter>
 
-    <md-option
-      *ngFor="let g of groups"
-      [value]="g"
-    >
-      {{ g.name }}
-    </md-option>
-  </md-select>
-
-  <md-select
-    class="filter-select"
-    multiple="true"
-    [placeholder]="'VM_PAGE.FILTERS.SELECT_STATES' | translate"
+  <cs-states-filter
     [(ngModel)]="selectedStates"
-    (change)="update()"
-  >
-    <md-option *ngFor="let s of states" [value]="s.state">
-      {{ s.name | translate }}
-    </md-option>
-  </md-select>
+    (ngModelChange)="update()"
+  ></cs-states-filter>
+
   <cs-divider-vertical></cs-divider-vertical>
-  <cs-draggable-select
-    class="filter-select"
-    multiple="true"
-    [placeholder]="'VM_PAGE.FILTERS.GROUP_BY' | translate"
+
+  <cs-groupings-filter
+    [availableGroupings]="availableGroupings"
     [(ngModel)]="selectedGroupings"
-    [dragItems]="availableGroupings"
-    (change)="update()"
-  >
-    <md-option *ngFor="let g of availableGroupings" [value]="g">
-      {{ g.label | translate }}
-    </md-option>
-  </cs-draggable-select>
+    (ngModelChange)="update()"
+  ></cs-groupings-filter>
 </div>

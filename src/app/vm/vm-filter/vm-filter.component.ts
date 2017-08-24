@@ -1,12 +1,15 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as sortBy from 'lodash/sortBy';
 import { InstanceGroup, Zone } from '../../shared/models';
-import { FilterService } from '../../shared/services/filter.service';
+import { FilterConfig, FilterService } from '../../shared/services/filter.service';
 import { InstanceGroupService } from '../../shared/services/instance-group.service';
 import { LocalStorageService } from '../../shared/services/local-storage.service';
 import { VmState } from '../shared/vm.model';
 import { VmService } from '../shared/vm.service';
+import { GroupsFilterService, noGroup } from './groups-filter/groups-filter.service';
+import { GroupingsFilterService } from './groupings-filter/groupings-filter.service';
+import { StatesFilterService } from './states-filter/states-filter.service';
+import { ZonesFilterService } from './zones-filter/zones-filter.service';
 
 
 export interface VmFilter {
@@ -16,128 +19,88 @@ export interface VmFilter {
   groupings: Array<any>;
 }
 
-export type noGroup = '-1';
-export const noGroup: noGroup = '-1';
-export type InstanceGroupOrNoGroup = InstanceGroup | noGroup;
-
 @Component({
   selector: 'cs-vm-filter',
   templateUrl: 'vm-filter.component.html',
   styleUrls: ['vm-filter.component.scss']
 })
-export class VmFilterComponent implements OnInit, OnChanges {
+export class VmFilterComponent {
   @Input() public availableGroupings: Array<any>;
   @Input() public groups: Array<InstanceGroup>;
   @Input() public zones: Array<Zone>;
   @Output() public updateFilters = new EventEmitter<VmFilter>();
 
-  public noGroup = noGroup;
+  public selectedGroupings: Array<any>;
+  public selectedGroups: Array<InstanceGroup>;
+  public selectedZones: Array<Zone>;
+  public selectedStates: Array<VmState>;
 
-  public selectedGroups: Array<InstanceGroupOrNoGroup> = [];
-  public selectedStates: Array<VmState> = [];
-  public selectedZones: Array<Zone> = [];
-  public selectedGroupings: Array<any> = [];
-  public states = [
-    { state: VmState.Running, name: 'VM_PAGE.FILTERS.STATE_RUNNING' },
-    { state: VmState.Stopped, name: 'VM_PAGE.FILTERS.STATE_STOPPED' },
-    { state: VmState.Error, name: 'VM_PAGE.FILTERS.STATE_ERROR' }
+  private filters = [
+    {
+      service: this.zonesFilter,
+      getSelected: () => this.selectedZones
+    },
+    {
+      service: this.groupsFilter,
+      getSelected: () => this.selectedGroups
+    },
+    {
+      service: this.groupingsFilter,
+      getSelected: () => this.selectedGroupings
+    },
+    {
+      service: this.statesFilter,
+      getSelected: () => this.selectedStates
+    }
   ];
-  public showNoGroupFilter = true;
 
   private filtersKey = 'vmListFilters';
-  private filterService = new FilterService({
-    zones: { type: 'array', defaultOption: [] },
-    groups: { type: 'array', defaultOption: [] },
-    groupings: { type: 'array', defaultOption: [] },
-    states: { type: 'array', options: this.states.map(_ => _.state), defaultOption: [] }
-  }, this.router, this.storage, this.filtersKey, this.activatedRoute);
+
+  private filterService = new FilterService(
+    this.filtersConfig,
+    this.router,
+    this.storage,
+    this.filtersKey,
+    this.activatedRoute
+  );
 
   constructor(
+    private groupingsFilter: GroupingsFilterService,
+    private groupsFilter: GroupsFilterService,
+    private statesFilter: StatesFilterService,
+    private zonesFilter: ZonesFilterService,
+
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private instanceGroupService: InstanceGroupService,
-    private vmService: VmService,
     private storage: LocalStorageService
   ) {}
 
-  public ngOnInit(): void {
-    this.instanceGroupService.groupsUpdates.subscribe(() => this.loadGroups());
-  }
-
-  public ngOnChanges(changes: SimpleChanges): void {
-    const groups = changes['groups'];
-    const zones = changes['zones'];
-    if (groups.currentValue && zones.currentValue) {
-      this.initFilters();
-    }
-  }
-
-  public initFilters(): void {
-    const params = this.filterService.getParams();
-    this.selectedZones = this.zones.filter(zone =>
-      params['zones'].find(id => id === zone.id)
-    );
-    this.selectedGroups = this.groups.filter(group =>
-      params['groups'].find(name => name === group.name)
-    );
-    this.selectedStates = params.states;
-    this.selectedGroupings = params.groupings.reduce((acc, _) => {
-      const grouping = this.availableGroupings.find(g => g.key === _);
-      if (grouping) {
-        acc.push(grouping);
-      }
-      return acc;
-    }, []);
-
-    const sg = this.selectedGroupings;
-    this.availableGroupings.sort((groupingA, groupingB) => {
-      return sg.findIndex(_ => _ === groupingA) - sg.findIndex(_ => _ === groupingB);
-    });
-
-    const containsNoGroup = params['groups'].includes('');
-    if (containsNoGroup) {
-      this.selectedGroups.push(noGroup);
-    }
-
-    this.update();
-  }
-
-  public loadGroups(): void {
-    this.vmService.getInstanceGroupList().subscribe(groupList => {
-      this.groups = groupList.sort(this.groupSortPredicate);
-      this.selectedGroups = this.selectedGroups.filter(selectedGroup => {
-        return groupList.some(
-          group => group.name === (selectedGroup as InstanceGroup).name);
-      });
-    });
-  }
-
   public update(): void {
-    this.updateFilters.emit({
-      selectedGroups: this.selectedGroups.sort(this.groupSortPredicate),
-      selectedStates: this.selectedStates,
-      selectedZones: sortBy(this.selectedZones, 'name'),
-      groupings: this.selectedGroupings
-    });
-
-    this.filterService.update(this.filtersKey, {
-      zones: this.selectedZones.map(_ => _.id),
-      groups: this.selectedGroups.map(_ => (_ as InstanceGroup).name || ''),
-      states: this.selectedStates,
-      groupings: this.selectedGroupings.map(_ => _.key)
-    });
+    this.updateFilters.emit(this.updateFiltersEmitMessage);
+    this.filterService.update(this.filtersKey, this.filterServiceUpdateMessage);
   }
 
-  private groupSortPredicate(
-    a: InstanceGroupOrNoGroup,
-    b: InstanceGroupOrNoGroup
-  ): number {
-    if (a === noGroup || a.name < (b as InstanceGroup).name) {
-      return -1;
-    }
-    if (b === noGroup || a.name > b.name) {
-      return 1;
-    }
-    return 0;
+  private get filtersConfig(): FilterConfig {
+    return this.filters.reduce((acc, filter) => {
+      return Object.assign(acc, {
+        [filter.service.key]: filter.service.filterConfig
+      });
+    }, {});
+  }
+
+  private get updateFiltersEmitMessage(): any {
+    return this.filters.reduce((acc, filter) => {
+      return Object.assign(acc, {
+        [filter.service.key]: filter.service.getUpdateFiltersEmitMessage(filter.getSelected())
+      });
+    }, {});
+  }
+
+  private get filterServiceUpdateMessage(): any {
+    return this.filters.reduce((acc, filter) => {
+      return Object.assign(acc, {
+        [filter.service.key]: filter.service.stringifyEntities(filter.getSelected())
+      });
+    }, {});
   }
 }

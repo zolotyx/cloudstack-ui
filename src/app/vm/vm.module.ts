@@ -72,6 +72,14 @@ import { vmRouting } from './vm.routing';
 import { WebShellService } from './web-shell/web-shell.service';
 import { StatisticsComponent } from './vm-sidebar/statistics/statistics.component';
 import { VmDetailTemplateComponent } from './vm-sidebar/template/vm-detail-template.component';
+import { GroupingsFilterComponent } from './vm-filter/groupings-filter/groupings-filter.component';
+import { GroupsFilterComponent } from './vm-filter/groups-filter/groups-filter.component';
+import { StatesFilterComponent } from './vm-filter/states-filter/states-filter.component';
+import { ZonesFilterComponent } from './vm-filter/zones-filter/zones-filter.component';
+import { GroupingsFilterService } from './vm-filter/groupings-filter/groupings-filter.service';
+import { GroupsFilterService } from './vm-filter/groups-filter/groups-filter.service';
+import { StatesFilterService } from './vm-filter/states-filter/states-filter.service';
+import { ZonesFilterService } from './vm-filter/zones-filter/zones-filter.service';
 
 
 @NgModule({
@@ -104,6 +112,10 @@ import { VmDetailTemplateComponent } from './vm-sidebar/template/vm-detail-templ
     MdTabsModule,
   ],
   declarations: [
+    GroupingsFilterComponent,
+    GroupsFilterComponent,
+    StatesFilterComponent,
+    ZonesFilterComponent,
     AffinityGroupSelectorComponent,
     KeyboardsComponent,
     FirewallRulesDetailComponent,
@@ -138,6 +150,11 @@ import { VmDetailTemplateComponent } from './vm-sidebar/template/vm-detail-templ
     SnapshotModalComponent,
   ],
   providers: [
+    GroupingsFilterService,
+    GroupsFilterService,
+    StatesFilterService,
+    ZonesFilterService,
+
     VmActionsService,
     VmCreationFormNormalizationService,
     VmCreationService,

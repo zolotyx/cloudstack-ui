@@ -1,0 +1,18 @@
+<md-select
+  class="filter-select"
+  multiple="true"
+  [placeholder]="'VM_PAGE.FILTERS.SELECT_GROUPS' | translate"
+  [(ngModel)]="selectedGroups"
+  (change)="update()"
+>
+  <md-option [value]="noGroup">
+    <em>{{ 'VM_PAGE.FILTERS.NO_GROUP' | translate }}</em>
+  </md-option>
+
+  <md-option
+    *ngFor="let g of groups"
+    [value]="g"
+  >
+    {{ g.name }}
+  </md-option>
+</md-select>
