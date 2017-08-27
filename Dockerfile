@@ -11,7 +11,7 @@ RUN apk update \
 
 RUN cd /tmp/cloudstackui \
     && chmod -R 777 /tmp/cloudstackui \
-    && yarn \
+    && yarn install --verbose \
     && yarn run build:aot \
     && yarn cache clean \
     && mkdir -p /static && cp -R dist/. /static/ \
