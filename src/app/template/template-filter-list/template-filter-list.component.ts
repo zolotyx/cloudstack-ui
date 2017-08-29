@@ -1,7 +1,9 @@
 import {
-  Component, EventEmitter, Input, OnChanges, Output,
+  Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output,
   SimpleChanges
 } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs/Subscription';
 
 import { OsFamily } from '../../shared/models/os-type.model';
 import { Zone } from '../../shared/models/zone.model';
@@ -11,6 +13,8 @@ import { BaseTemplateModel } from '../shared/base-template.model';
 import { TemplateFilters } from '../shared/base-template.service';
 import { Iso } from '../shared/iso.model';
 import { Template } from '../shared/template.model';
+import { TAppState } from '../../auth/redux/reducers/index';
+import { getUsername } from '../../auth/redux/selectors/auth.selectors';
 
 
 @Component({
@@ -18,7 +22,7 @@ import { Template } from '../shared/template.model';
   templateUrl: 'template-filter-list.component.html',
   styleUrls: ['template-filter-list.component.scss']
 })
-export class TemplateFilterListComponent implements OnChanges {
+export class TemplateFilterListComponent implements OnInit, OnDestroy, OnChanges {
   @Input() public templates: Array<Template>;
   @Input() public isos: Array<Iso>;
 
@@ -35,6 +39,9 @@ export class TemplateFilterListComponent implements OnChanges {
   public selectedZones: Array<Zone> = [];
   public visibleTemplateList: Array<BaseTemplateModel> = [];
 
+  protected subscription: Subscription;
+  public username: string;
+
   public selectedGroupings = [];
   public groupings = [
     {
@@ -47,10 +54,26 @@ export class TemplateFilterListComponent implements OnChanges {
 
   protected authService = ServiceLocator.injector.get(AuthService);
 
+  constructor(protected store: Store<TAppState>) {}
+
   public ngOnChanges(changes: SimpleChanges) {
     if (changes['isos'] || changes['templates']) {
       this.updateList();
     }
+  }
+
+  public ngOnInit(): void {
+    this.getUsername();
+  }
+
+  public ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  public getUsername() {
+    this.subscription = this.store.select(getUsername).subscribe(username => {
+      this.username = username;
+    });
   }
 
   public get templateList(): Array<BaseTemplateModel> {
@@ -101,7 +124,7 @@ export class TemplateFilterListComponent implements OnChanges {
           this.selectedFilters.includes(TemplateFilters.featured) || !template.isFeatured;
         const selfFilter = !this.selectedFilters || !this.selectedFilters.length ||
           this.selectedFilters.includes(TemplateFilters.self) ||
-          !(template.account === this.authService.username);
+          !(template.account === this.username);
         const osFilter = !this.selectedOsFamilies || !this.selectedOsFamilies.length ||
           this.selectedOsFamilies.includes(template.osType.osFamily);
         return featuredFilter && selfFilter && osFilter;

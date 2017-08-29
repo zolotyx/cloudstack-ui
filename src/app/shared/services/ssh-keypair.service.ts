@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { Http } from '@angular/http';
 
 import { SSHKeyPair } from '../models';
 import { BackendResource } from '../decorators';
 import { BaseBackendCachedService } from './base-backend-cached.service';
 import { VirtualMachine } from '../../vm/shared/vm.model';
 import { AsyncJobService } from './async-job.service';
+import { ErrorService } from './error.service';
+import { CacheService } from './cache.service';
 
 
 export interface SshKeyCreationData {
@@ -19,8 +22,11 @@ export interface SshKeyCreationData {
   entityModel: SSHKeyPair
 })
 export class SSHKeyPairService extends BaseBackendCachedService<SSHKeyPair> {
-  constructor(private asyncJobService: AsyncJobService) {
-    super();
+  constructor(private asyncJobService: AsyncJobService,
+              public errorService: ErrorService,
+              public http: Http,
+              public cacheService: CacheService) {
+    super(cacheService, errorService, http);
   }
 
   public create(params: SshKeyCreationData): Observable<SSHKeyPair> {

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { MdDialog } from '@angular/material';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../shared/services/auth.service';
-import { RouterUtilsService } from '../shared/services/router-utils.service';
+import { Store } from '@ngrx/store';
+import { TAppState } from './redux/reducers/index';
+import { AuthLogOutAction } from './redux/actions/auth.actions';
 
 
 @Component({
@@ -11,19 +10,10 @@ import { RouterUtilsService } from '../shared/services/router-utils.service';
 })
 export class LogoutComponent implements OnInit {
   constructor(
-    private activatedRoute: ActivatedRoute,
-    private authService: AuthService,
-    private dialog: MdDialog,
-    private router: Router,
-    private routerUtilsService: RouterUtilsService
+    private store: Store<TAppState>
   ) {}
 
   public ngOnInit(): void {
-    this.authService.logout().subscribe(() => {
-      const next = this.activatedRoute.snapshot.queryParams['next'];
-      const redirectionParams = next ? this.routerUtilsService.getRedirectionQueryParams(next) : {};
-      this.router.navigate(['/login'], redirectionParams);
-      this.dialog.closeAll();
-    });
+    this.store.dispatch(new AuthLogOutAction());
   }
 }

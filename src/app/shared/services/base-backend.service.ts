@@ -20,14 +20,11 @@ export abstract class BaseBackendService<M extends BaseModel> {
   protected entity: string;
   protected entityModel: { new (params?): M; };
 
-  protected error: ErrorService;
-  protected http: Http;
-
   protected requestCache: Cache<Observable<Array<M>>>;
 
-  constructor() {
-    this.error = ServiceLocator.injector.get(ErrorService);
-    this.http = ServiceLocator.injector.get(Http);
+  constructor(protected cacheService: CacheService,
+              protected errorService: ErrorService,
+              protected http: Http) {
     this.initRequestCache();
   }
 
@@ -204,14 +201,12 @@ export abstract class BaseBackendService<M extends BaseModel> {
 
   private handleError(response): Observable<any> {
     const error = response.json();
-    this.error.next(response);
+    this.errorService.next(response);
     return Observable.throw(error);
   }
 
   private initRequestCache(): void {
     const cacheTag = `${this.entity}RequestCache`;
-    this.requestCache = ServiceLocator.injector
-      .get(CacheService)
-      .get<Observable<Array<M>>>(cacheTag);
+    this.requestCache = this.cacheService.get<Observable<Array<M>>>(cacheTag);
   }
 }

@@ -1,3 +1,4 @@
+import { MdDialog, MdIconModule, MdTooltipModule } from '@angular/material';
 import { DISABLE_NATIVE_VALIDITY_CHECKING, MdlModule } from '@angular-mdl/core';
 import { MdlPopoverModule } from '@angular-mdl/popover';
 import { MdlSelectModule } from '@angular-mdl/select';
@@ -36,6 +37,13 @@ import { TemplateModule } from './template';
 import { VmModule } from './vm';
 
 
+
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { reducers } from './auth/redux/reducers/index';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { RoutingEffects } from './auth/redux/effects/routing.effects';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
 export function HttpLoaderFactory(http: Http): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './i18n/', '.json');
 }
@@ -48,6 +56,9 @@ export function HttpLoaderFactory(http: Http): TranslateHttpLoader {
     HttpModule,
     FormsModule,
     TranslateModule.forRoot(),
+    StoreModule.forRoot(reducers),
+    StoreDevtoolsModule.instrument(),
+    EffectsModule.forRoot([RoutingEffects]),
     EventsModule,
     DragulaModule,
     MdIconModule,
@@ -72,6 +83,7 @@ export function HttpLoaderFactory(http: Http): TranslateHttpLoader {
         deps: [Http]
       }
     }),
+    StoreRouterConnectingModule,
     RouterModule.forRoot(routes)
   ],
   declarations: [

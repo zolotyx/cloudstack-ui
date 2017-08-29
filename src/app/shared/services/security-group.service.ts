@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Rules } from '../../security-group/sg-creation/sg-creation.component';
@@ -8,6 +9,8 @@ import { AsyncJobService } from './async-job.service';
 import { BaseBackendCachedService } from './base-backend-cached.service';
 import { ConfigService } from './config.service';
 import { SecurityGroupTagService } from './tags/security-group-tag.service';
+import { CacheService } from './cache.service';
+import { ErrorService } from './error.service';
 
 
 export const GROUP_POSTFIX = '-cs-sg';
@@ -23,9 +26,12 @@ export class SecurityGroupService extends BaseBackendCachedService<SecurityGroup
   constructor(
     private asyncJobService: AsyncJobService,
     private configService: ConfigService,
-    private securityGroupTagService: SecurityGroupTagService
+    private securityGroupTagService: SecurityGroupTagService,
+    public cacheService: CacheService,
+    public errorService: ErrorService,
+    public http: Http
   ) {
-    super();
+    super(cacheService, errorService, http);
   }
 
   public getTemplates(): Array<SecurityGroup> {

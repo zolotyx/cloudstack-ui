@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+
 import { BackendResource } from '../../shared/decorators';
 import { BaseBackendService } from '../../shared/services/base-backend.service';
 import { padStart } from '../../shared/utils/padStart';
@@ -8,6 +10,8 @@ import { Policy, TimePolicy } from './policy-editor/policy-editor.component';
 import { PolicyType } from './recurring-snapshots.component';
 import { SnapshotPolicy } from './snapshot-policy.model';
 import { Time } from './time-picker/time-picker.component';
+import { CacheService } from '../../shared/services/cache.service';
+import { ErrorService } from '../../shared/services/error.service';
 
 
 export interface SnapshotPolicyCreationParams {
@@ -22,6 +26,12 @@ export interface SnapshotPolicyCreationParams {
   entityModel: SnapshotPolicy
 })
 export class SnapshotPolicyService extends BaseBackendService<SnapshotPolicy> {
+  constructor(public cacheService: CacheService,
+              public errorService: ErrorService,
+              public http: Http) {
+    super(cacheService, errorService, http);
+  }
+
   public getPolicyList(volumeId: string): Observable<Array<Policy<TimePolicy>>> {
     return super.getList(
       { volumeId },

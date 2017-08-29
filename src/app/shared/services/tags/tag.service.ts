@@ -1,10 +1,14 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+
 import { BackendResource } from '../../decorators/backend-resource.decorator';
 import { Taggable } from '../../interfaces/taggable.interface';
 import { Tag } from '../../models/tag.model';
 import { AsyncJobService } from '../async-job.service';
 import { BaseBackendCachedService } from '../base-backend-cached.service';
+import { ErrorService } from '../error.service';
+import { CacheService } from '../cache.service';
 
 
 @Injectable()
@@ -13,8 +17,11 @@ import { BaseBackendCachedService } from '../base-backend-cached.service';
   entityModel: Tag
 })
 export class TagService extends BaseBackendCachedService<Tag> {
-  constructor(private asyncJob: AsyncJobService) {
-    super();
+  constructor(private asyncJob: AsyncJobService,
+              public errorService: ErrorService,
+              public http: Http,
+              public cacheService: CacheService) {
+    super(cacheService, errorService, http);
   }
 
   public create(params?: {}): Observable<any> {

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Subject } from 'rxjs/Subject';
@@ -7,6 +8,7 @@ import { AsyncJob } from '../models';
 import { BaseBackendService } from './base-backend.service';
 import { BackendResource } from '../decorators';
 import { ErrorService } from './error.service';
+import { CacheService } from './cache.service';
 
 
 const enum JobStatus {
@@ -27,8 +29,10 @@ export class AsyncJobService extends BaseBackendService<AsyncJob<any>> {
   private timerIds: Array<any> = [];
   private jobs: Array<Subject<AsyncJob<any>>> = [];
 
-  constructor() {
-    super();
+  constructor(public errorService: ErrorService,
+              public http: Http,
+              public cacheService: CacheService) {
+    super(cacheService, errorService, http);
     this.pollingInterval = 2000;
     this.immediatePollingInterval = 100;
     this.event = new Subject<AsyncJob<any>>();

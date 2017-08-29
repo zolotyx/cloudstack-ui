@@ -9,7 +9,10 @@ import { NotificationService } from '../shared/services/notification.service';
 import { StyleService } from '../shared/services/style.service';
 import { UserTagService } from '../shared/services/tags/user-tag.service';
 import { UserService } from '../shared/services/user.service';
+import { Store } from '@ngrx/store';
 import { WithUnsubscribe } from '../utils/mixins/with-unsubscribe';
+import { getUserId } from '../auth/redux/selectors/auth.selectors';
+import { TAppState } from '../auth/redux/reducers/index';
 
 
 @Component({
@@ -18,6 +21,7 @@ import { WithUnsubscribe } from '../utils/mixins/with-unsubscribe';
   styleUrls: ['settings.component.scss']
 })
 export class SettingsComponent extends WithUnsubscribe() implements OnInit {
+  readonly userId$ = this.store.select(getUserId);
   public userId: string;
   public accentColor: Color;
   public firstDayOfWeek = 1;
@@ -57,7 +61,8 @@ export class SettingsComponent extends WithUnsubscribe() implements OnInit {
     private styleService: StyleService,
     private translateService: TranslateService,
     private userService: UserService,
-    private userTagService: UserTagService
+    private userTagService: UserTagService,
+    private store: Store<TAppState>
   ) {
     super();
     this.userId = this.authService.userId;
@@ -129,11 +134,12 @@ export class SettingsComponent extends WithUnsubscribe() implements OnInit {
   }
 
   public updatePassword(): void {
-    this.userService.updatePassword(this.authService.userId, this.password)
-      .subscribe(
-        () => this.notificationService.message('SETTINGS.SECURITY.PASSWORD_CHANGED_SUCCESSFULLY'),
-        error => this.notificationService.error(error.errortext)
-      );
+    this.userId$.switchMap(userId => {
+      return this.userService.updatePassword(userId, this.password);
+    }).subscribe(
+      () => this.notificationService.message('PASSWORD_CHANGED_SUCCESSFULLY'),
+      error => this.notificationService.error(error.errortext)
+    );
     this.passwordUpdateForm.reset();
   }
 

@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+
 import { Observable } from 'rxjs/Observable';
 import { BackendResource } from '../decorators/backend-resource.decorator';
 import { Snapshot } from '../models/snapshot.model';
 import { AsyncJobService } from './async-job.service';
 import { BaseBackendCachedService } from './base-backend-cached.service';
 import { SnapshotTagService } from './tags/snapshot-tag.service';
+import { CacheService } from './cache.service';
+import { ErrorService } from './error.service';
 import { Subject } from 'rxjs/Subject';
-
 
 @Injectable()
 @BackendResource({
@@ -18,9 +21,12 @@ export class SnapshotService extends BaseBackendCachedService<Snapshot> {
 
   constructor(
     private asyncJobService: AsyncJobService,
-    private snapshotTagService: SnapshotTagService
+    private snapshotTagService: SnapshotTagService,
+    public cacheService: CacheService,
+    public errorService: ErrorService,
+    public http: Http
   ) {
-    super();
+    super(cacheService, errorService, http);
   }
 
   public create(volumeId: string, name?: string, description?: string): Observable<Snapshot> {

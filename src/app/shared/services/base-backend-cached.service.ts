@@ -1,16 +1,20 @@
 import { Observable } from 'rxjs/Observable';
+import { Http } from '@angular/http';
+
 import { BaseModel } from '../models';
 import { CacheService } from './cache.service';
 import { ApiFormat, BaseBackendService } from './base-backend.service';
 import { Cache } from './cache';
-import { ServiceLocator } from './service-locator';
+import { ErrorService } from './error.service';
 
 
 export abstract class BaseBackendCachedService<M extends BaseModel> extends BaseBackendService<M> {
   private cache: Cache<Array<M>>;
 
-  constructor() {
-    super();
+  constructor(protected cacheService: CacheService,
+              public errorService: ErrorService,
+              public http: Http) {
+    super(cacheService, errorService, http);
     this.initDataCache();
   }
 
@@ -42,8 +46,6 @@ export abstract class BaseBackendCachedService<M extends BaseModel> extends Base
 
   private initDataCache(): void {
     const cacheTag = `${this.entity}DataCache`;
-    this.cache = ServiceLocator.injector
-      .get(CacheService)
-      .get<Array<M>>(cacheTag);
+    this.cache = this.cacheService.get<Array<M>>(cacheTag);
   }
 }

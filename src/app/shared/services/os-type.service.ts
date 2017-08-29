@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { BackendResource } from '../decorators';
 import { OsFamily, OsType } from '../models/os-type.model';
 import { BaseBackendService } from './base-backend.service';
+import { CacheService } from './cache.service';
+import { ErrorService } from './error.service';
 
 
 @Injectable()
@@ -15,6 +18,12 @@ export class OsTypeService extends BaseBackendService<OsType> {
   private osTypes: Array<OsType>;
   private requestObservable: Observable<Array<OsType>>;
 
+  constructor(public cacheService: CacheService,
+              public errorService: ErrorService,
+              public http: Http) {
+    super(cacheService, errorService, http);
+  }
+  
   public get(id: string): Observable<OsType> {
     if (this.osTypes) {
       return Observable.of(this.osTypes.find(osType => osType.id === id));

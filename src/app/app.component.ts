@@ -15,6 +15,9 @@ import { RouterUtilsService } from './shared/services/router-utils.service';
 import { SessionStorageService } from './shared/services/session-storage.service';
 import { StyleService } from './shared/services/style.service';
 import { ZoneService } from './shared/services/zone.service';
+import { Store } from '@ngrx/store';
+import { getName, isAuthenticated } from './auth/redux/selectors/auth.selectors';
+import { TAppState } from './auth/redux/reducers/index';
 
 
 @Component({
@@ -28,9 +31,13 @@ export class AppComponent implements OnInit {
   public title: string;
   public disableSecurityGroups = false;
 
+  readonly loggedIn$ = this.store.select(isAuthenticated);
+  readonly username$ = this.store.select(getName);
+
   constructor(
     private auth: AuthService,
     private router: Router,
+    private store: Store<TAppState>,
     private error: ErrorService,
     private languageService: LanguageService,
     private asyncJobService: AsyncJobService,
@@ -54,6 +61,7 @@ export class AppComponent implements OnInit {
     this.auth.loggedIn.subscribe(isLoggedIn => {
       this.loggedIn = isLoggedIn;
       this.updateAccount(this.loggedIn);
+    // this.loggedIn$.subscribe(isLoggedIn => {
       if (isLoggedIn) {
         this.auth.startInactivityCounter();
         this.loadSettings();

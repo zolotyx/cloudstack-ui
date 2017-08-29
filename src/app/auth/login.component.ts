@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../shared/services/auth.service';
+import { ActivatedRoute } from '@angular/router';
 
 import { ConfigService } from '../shared/services/config.service';
-import { NotificationService } from '../shared/services/notification.service';
+import { Store } from '@ngrx/store';
+import { TAppState } from './redux/reducers/index';
+import { AuthLogInAction } from './redux/actions/auth.actions';
 
 
 @Component({
@@ -24,10 +25,8 @@ export class LoginComponent implements OnInit {
   public showDomain = false;
 
   constructor(
-    private auth: AuthService,
-    private notification: NotificationService,
+    private store: Store<TAppState>,
     private route: ActivatedRoute,
-    private router: Router,
     private configService: ConfigService
   ) {
   }
@@ -45,7 +44,10 @@ export class LoginComponent implements OnInit {
 
   public onSubmit(): void {
     if (this.username && this.password) {
-      this.login(this.username, this.password, this.domain);
+      this.store.dispatch(new AuthLogInAction({
+        username: this.username,
+        password: this.password
+      }));
       return;
     }
     if (!this.username) {
@@ -59,25 +61,5 @@ export class LoginComponent implements OnInit {
   private setErrors(control: AbstractControl): void {
     control.setErrors({ required: true });
     control.markAsDirty();
-  }
-
-  private login(username: string, password: string, domain: string): void {
-    this.auth
-      .login(username, password, domain)
-      .subscribe(() => this.handleLogin(), error => this.handleError(error));
-  }
-
-  private handleLogin(): void {
-    const next = this.route.snapshot.queryParams['next'] &&
-        this.route.snapshot.queryParams['next'] !== '/login' &&
-        this.route.snapshot.queryParams['next'] !== 'login' ? this.route.snapshot.queryParams['next'] : '';
-    this.router.navigateByUrl(next);
-  }
-
-  private handleError(error: any): void {
-    this.notification.message({
-      translationToken: error.message,
-      interpolateParams: error.params
-    });
   }
 }

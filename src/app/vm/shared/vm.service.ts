@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+
 import { SecurityGroup } from '../../security-group/sg.model';
 import { BackendResource } from '../../shared/decorators';
 import { AsyncJob, OsType, ServiceOffering, Volume } from '../../shared/models';
@@ -17,6 +19,8 @@ import { Iso } from '../../template/shared';
 import { VmActions } from '../vm-actions/vm-action';
 import { IVirtualMachineCommand } from '../vm-actions/vm-command';
 import { VirtualMachine, VmState } from './vm.model';
+import { CacheService } from '../../shared/services/cache.service';
+import { ErrorService } from '../../shared/services/error.service';
 
 
 export const VirtualMachineEntityName = 'VirtualMachine';
@@ -35,9 +39,12 @@ export class VmService extends BaseBackendService<VirtualMachine> {
     private serviceOfferingService: ServiceOfferingService,
     private securityGroupService: SecurityGroupService,
     private userTagService: UserTagService,
-    private volumeService: VolumeService
+    private volumeService: VolumeService,
+    public cacheService: CacheService,
+    public errorService: ErrorService,
+    public http: Http
   ) {
-    super();
+    super(cacheService, errorService, http);
   }
 
   public getNumberOfVms(): Observable<number> {

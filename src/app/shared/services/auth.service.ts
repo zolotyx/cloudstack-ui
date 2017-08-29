@@ -1,5 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
+import { Http } from '@angular/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -13,6 +14,11 @@ import { RouterUtilsService } from './router-utils.service';
 import { LocalStorageService } from './local-storage.service';
 import { UserService } from './user.service';
 import { UserTagService } from './tags/user-tag.service';
+import { ErrorService } from './error.service';
+import { CacheService } from './cache.service';
+import { TAppState } from '../../auth/redux/reducers/index';
+import { Store } from '@ngrx/store';
+import { AuthRefreshSessionAction } from '../../auth/redux/actions/auth.actions';
 
 
 const DEFAULT_SESSION_REFRESH_INTERVAL = 60;
@@ -37,9 +43,13 @@ export class AuthService extends BaseBackendService<BaseModelStub> {
     protected userService: UserService,
     protected userTagService: UserTagService,
     protected routerUtilsService: RouterUtilsService,
-    protected zone: NgZone
+    protected zone: NgZone,
+    protected store: Store<TAppState>,
+    public cacheService: CacheService,
+    public errorService: ErrorService,
+    public http: Http,
   ) {
-    super();
+    super(cacheService, errorService, http);
     this.loggedIn = new BehaviorSubject<boolean>(!!this.userId);
   }
 
@@ -128,7 +138,7 @@ export class AuthService extends BaseBackendService<BaseModelStub> {
     this.postRequest('logout')
       .do(() => this.setLoggedOut())
       .catch(error => {
-        this.error.send(error);
+        this.errorService.send(error);
         return Observable.throw('Unable to log out.');
       })
       .subscribe(() => obs.next());
@@ -141,6 +151,7 @@ export class AuthService extends BaseBackendService<BaseModelStub> {
 
   public sendRefreshRequest(): void {
     this.userService.getList().subscribe();
+    // this.store.dispatch(new AuthRefreshSessionAction());
   }
 
   private setLoggedIn(username: string, name: string, userId: string): void {

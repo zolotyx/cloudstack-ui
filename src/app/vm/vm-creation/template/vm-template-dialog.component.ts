@@ -5,6 +5,8 @@ import { BaseTemplateModel } from '../../../template/shared/base-template.model'
 import { Iso } from '../../../template/shared/iso.model';
 import { TemplateFilterListComponent } from '../../../template/template-filter-list/template-filter-list.component';
 import { MD_DIALOG_DATA, MdDialogRef } from '@angular/material';
+import { TAppState } from '../../../auth/redux/reducers/index';
+import { Store } from '@ngrx/store';
 
 
 @Component({
@@ -21,9 +23,10 @@ export class VmTemplateDialogComponent extends TemplateFilterListComponent imple
 
   constructor(
     @Inject(MD_DIALOG_DATA) data,
-    private dialogRef: MdDialogRef<VmTemplateDialogComponent>
+    private dialogRef: MdDialogRef<VmTemplateDialogComponent>,
+    public store: Store<TAppState>
   ) {
-    super();
+    super(store);
 
     this.preselectedTemplate = data.template;
     this.templates = data.templates;
