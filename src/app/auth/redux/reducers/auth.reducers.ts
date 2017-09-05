@@ -28,7 +28,6 @@ export function authReducer(
   action: auth.Actions
 ): TAuthState {
   switch (action.type) {
-
     case AUTH_REFRESH_SESSION: {
       return {
         ...state,
@@ -53,7 +52,6 @@ export function authReducer(
     }
 
     case AUTH_LOG_IN_SUCCESS: {
-      // debugger;
       return {
         ...state,
         isLoading: false,

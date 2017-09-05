@@ -20,7 +20,6 @@ import { AccountType } from '../models/account.model';
   entityModel: BaseModelStub
 })
 export class AuthService extends BaseBackendService<BaseModelStub> {
-  public loggedIn: BehaviorSubject<boolean>;
   private _user: User | null;
 
   constructor(
@@ -39,10 +38,6 @@ export class AuthService extends BaseBackendService<BaseModelStub> {
         this._user = new User(user);
       } catch (e) {}
     }
-
-    this.loggedIn = new BehaviorSubject<boolean>(
-      !!(this._user && this._user.userId)
-    );
   }
 
   public get user(): User | null {
@@ -72,10 +67,6 @@ export class AuthService extends BaseBackendService<BaseModelStub> {
     return obs;
   }
 
-  public isLoggedIn(): Observable<boolean> {
-    return Observable.of(!!(this._user && this._user.userId));
-  }
-
   public isAdmin(): boolean {
     return !!this.user && this.user.type !== AccountType.User;
   }
@@ -83,12 +74,10 @@ export class AuthService extends BaseBackendService<BaseModelStub> {
   private setLoggedIn(loginRes): void {
     this._user = new User(loginRes);
     this.storage.write('user', JSON.stringify(this._user.serialize()));
-    this.loggedIn.next(true);
   }
 
   private setLoggedOut(): void {
     this._user = null;
     this.storage.remove('user');
-    this.loggedIn.next(false);
   }
 }

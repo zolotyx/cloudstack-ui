@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { AuthService } from './auth.service';
 import { Utils } from './utils.service';
+import { TAppState } from '../../auth/redux/reducers/index';
+import { Store } from '@ngrx/store';
+import { isAuthenticated } from '../../auth/redux/selectors/auth.selectors';
 
 
 export enum INotificationStatus {
@@ -23,9 +25,10 @@ export class JobsNotificationService {
   private _pendingJobsCount: number;
   private _unseenJobs: Subject<number>;
 
-  constructor(private authService: AuthService) {
+  constructor(
+    private store: Store<TAppState>) {
     this.reset();
-    this.authService.loggedIn.subscribe(() => this.reset());
+    this.store.select(isAuthenticated).subscribe(() => this.reset());
   }
 
   public get pendingJobsCount(): number {

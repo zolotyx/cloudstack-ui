@@ -46,7 +46,13 @@ describe('Base backend service', () => {
     entity: 'Test',
     entityModel: TestModel
   })
-  class TestBackendService extends BaseBackendService<TestModel> { }
+  class TestBackendService extends BaseBackendService<TestModel> {
+    constructor(public errorService: ErrorService,
+                public http: Http,
+                public cacheService: CacheService) {
+      super(cacheService, errorService, http);
+    }
+  }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

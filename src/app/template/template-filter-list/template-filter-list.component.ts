@@ -1,9 +1,7 @@
 import {
-  Component, EventEmitter, Input, OnChanges,OnDestroy, OnInit, Output,
+  Component, EventEmitter, Input, OnChanges, Output,
   SimpleChanges
 } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs/Subscription';
 
 import { OsFamily } from '../../shared/models/os-type.model';
 import { Zone } from '../../shared/models/zone.model';
@@ -12,8 +10,6 @@ import { BaseTemplateModel } from '../shared/base-template.model';
 import { TemplateFilters } from '../shared/base-template.service';
 import { Iso } from '../shared/iso.model';
 import { Template } from '../shared/template.model';
-import { TAppState } from '../../auth/redux/reducers/index';
-import { getUsername } from '../../auth/redux/selectors/auth.selectors';
 
 
 @Component({
@@ -21,14 +17,14 @@ import { getUsername } from '../../auth/redux/selectors/auth.selectors';
   templateUrl: 'template-filter-list.component.html',
   styleUrls: ['template-filter-list.component.scss']
 })
-export class TemplateFilterListComponent implements OnInit, OnDestroy, OnChanges {
+export class TemplateFilterListComponent implements OnChanges {
   @Input() public templates: Array<Template>;
   @Input() public isos: Array<Iso>;
 
   @Input() public showDelimiter = true;
   @Input() public viewMode: string;
   @Input() public zoneId: string;
-  @Output() public deleteTemplate = new EventEmitter();
+  // @Output() public deleteTemplate = new EventEmitter();
   @Output() public viewModeChange = new EventEmitter();
 
   public fetching = false;
@@ -38,7 +34,6 @@ export class TemplateFilterListComponent implements OnInit, OnDestroy, OnChanges
   public selectedZones: Array<Zone> = [];
   public visibleTemplateList: Array<BaseTemplateModel> = [];
 
-  protected subscription: Subscription;
   public username: string;
 
   public selectedGroupings = [];
@@ -52,29 +47,12 @@ export class TemplateFilterListComponent implements OnInit, OnDestroy, OnChanges
   ];
 
   constructor(protected authService: AuthService) {
-
   }
-
-  constructor(protected store: Store<TAppState>) {}
 
   public ngOnChanges(changes: SimpleChanges) {
     if (changes['isos'] || changes['templates']) {
       this.updateList();
     }
-  }
-
-  public ngOnInit(): void {
-    this.getUsername();
-  }
-
-  public ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
-
-  public getUsername() {
-    this.subscription = this.store.select(getUsername).subscribe(username => {
-      this.username = username;
-    });
   }
 
   public get templateList(): Array<BaseTemplateModel> {

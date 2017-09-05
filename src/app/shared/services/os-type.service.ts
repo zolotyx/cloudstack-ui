@@ -23,7 +23,7 @@ export class OsTypeService extends BaseBackendService<OsType> {
               public http: Http) {
     super(cacheService, errorService, http);
   }
-  
+
   public get(id: string): Observable<OsType> {
     if (this.osTypes) {
       return Observable.of(this.osTypes.find(osType => osType.id === id));

@@ -7,6 +7,7 @@ import { CacheService } from './cache.service';
 import { ErrorService } from './error.service';
 import { ServiceLocator } from './service-locator';
 import { CustomQueryEncoder } from '../../utils/custom-query-encoder/custom-query-encoder';
+import { Inject } from '@angular/core';
 
 
 export const BACKEND_API_URL = 'client/api';

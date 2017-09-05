@@ -12,7 +12,7 @@ import {
   AUTH_LOG_OUT_SUCCESS,
   AuthLogInAction,
   AuthLogInErrorAction,
-  AuthLogInSuccessAction, AuthLogOutAction,
+  AuthLogInSuccessAction,
   AuthLogOutErrorAction,
   AuthLogOutSuccessAction, AuthRefreshSessionAction
 } from '../actions/auth.actions';
@@ -73,13 +73,9 @@ export class AuthEffects {
 
   @Effect()
   init$ = defer(() => {
-    const userData = {
-      name: this.authService.name,
-      username: this.authService.username,
-      userId: this.authService.userId
-    };
-    if (userData.userId) {
-      return Observable.of(new AuthRefreshSessionAction(userData));
+    const user = this.authService.user;
+    if (user && user.userId) {
+      return Observable.of(new AuthRefreshSessionAction(user));
     } else {
       return Observable.of(new AuthLogOutSuccessAction());
     }
