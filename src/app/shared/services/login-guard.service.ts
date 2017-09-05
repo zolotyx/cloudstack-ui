@@ -17,7 +17,6 @@ export class LoginGuard implements CanActivate {
   public canActivate(): Observable<boolean> {
     return this.store.select(isAuthenticated)
       .map(result => {
-        debugger;
         if (result) {
           this.router.navigate(['/instances']);
         }

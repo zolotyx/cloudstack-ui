@@ -37,7 +37,7 @@ import { VmModule } from './vm';
 
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { reducers, reducer } from './auth/redux/reducers/index';
+import { reducers } from './auth/redux/reducers/index';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AuthEffects } from './auth/redux/effects/auth.effects';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';

@@ -2,8 +2,6 @@ import {
   AUTH_LOG_IN,
   AUTH_LOG_IN_SUCCESS,
   AUTH_LOG_OUT, AUTH_REFRESH_SESSION,
-  AUTH_SESSION_EXPIRED,
-  AUTH_LOG_OUT_SUCCESS,
   AUTH_LOG_IN_ERROR
 } from '../actions/auth.actions';
 // import { Action } from '@ngrx/store';

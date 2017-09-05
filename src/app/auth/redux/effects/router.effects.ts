@@ -10,7 +10,6 @@ export class RouterEffects {
   navigate$ = this.actions$.ofType(RouterActions.GO)
     .map((action: RouterActions.Go) => action.payload)
     .do(({ path, query: queryParams, extras }) => {
-    debugger;
       this.router.navigate(
         path,
         { queryParams, ...extras }

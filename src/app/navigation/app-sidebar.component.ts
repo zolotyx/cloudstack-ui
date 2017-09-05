@@ -8,7 +8,6 @@ import {
   OnInit,
   ViewChild
 } from '@angular/core';
-import { Router } from '@angular/router';
 import { UserTagService } from 'app/shared/services/tags/user-tag.service';
 import { DragulaService } from 'ng2-dragula';
 import { Color } from '../shared/models/color.model';
@@ -25,6 +24,9 @@ import {
   sideBarRoutes,
   validateNavigationOrder
 } from './sidebar-routes';
+import { Go } from '../auth/redux/actions/router.actions';
+import { TAppState } from '../auth/redux/reducers/index';
+import { Store } from '@ngrx/store';
 
 
 @Component({
@@ -57,7 +59,7 @@ export class AppSidebarComponent extends WithUnsubscribe()
     private styleService: StyleService,
     private layoutService: LayoutService,
     private routerUtilsService: RouterUtilsService,
-    private router: Router,
+    private store: Store<TAppState>,
     private userTagService: UserTagService
   ) {
     super();
@@ -105,9 +107,10 @@ export class AppSidebarComponent extends WithUnsubscribe()
 
   public linkClick(routerLink: string): void {
     if (routerLink === this.routerUtilsService.getRouteWithoutQueryParams()) {
-      this.router.navigate(['reload'], {
-        queryParamsHandling: 'preserve'
-      });
+      this.store.dispatch(new Go({
+        path: ['reload'],
+        extras: { queryParamsHandling: 'preserve' }
+      }));
     }
   }
 

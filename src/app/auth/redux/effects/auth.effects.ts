@@ -1,28 +1,32 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { Actions, Effect } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
-
+import * as RoutingActions from '../actions/router.actions';
+import * as AuthActions from '../actions/auth.actions';
 import {
-  AUTH_LOG_IN, AUTH_LOG_IN_ERROR,
+  AUTH_LOG_IN,
+  AUTH_LOG_IN_ERROR,
   AUTH_LOG_IN_SUCCESS,
   AUTH_LOG_OUT,
-  // AUTH_LOG_OUT_ERROR,
   AUTH_LOG_OUT_SUCCESS,
-  AUTH_REFRESH_SESSION, AuthLogInAction,
+  AuthLogInAction,
   AuthLogInErrorAction,
-  AuthLogInSuccessAction,
+  AuthLogInSuccessAction, AuthLogOutAction,
   AuthLogOutErrorAction,
   AuthLogOutSuccessAction, AuthRefreshSessionAction
 } from '../actions/auth.actions';
 import { AuthService } from '../../../shared/services/auth.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { defer } from 'rxjs/observable/defer';
+import { isAuthenticated } from '../selectors/auth.selectors';
+import { Store } from '@ngrx/store';
+import { TAppState } from '../reducers/index';
 
 
 @Injectable()
 export class AuthEffects {
-  // public isAuthenticated$ = this.store.select(isAuthenticated);
+  readonly isAuthenticated$ = this.store.select(isAuthenticated);
 
   @Effect()
   authLogin$ = this.actions$
@@ -37,7 +41,7 @@ export class AuthEffects {
         .catch(error => Observable.of(new AuthLogInErrorAction(error)))
     );
 
-  @Effect({ dispatch: false })
+  @Effect()
   authLoginSuccess$ = this.actions$
     .ofType(AUTH_LOG_IN_SUCCESS)
     .map(() => this.redirectToIndexAction());
@@ -50,21 +54,22 @@ export class AuthEffects {
   @Effect()
   authLogOut$ = this.actions$
     .ofType(AUTH_LOG_OUT)
-    .switchMap(() => {
+    .switchMap((action: AuthActions.AuthLogOutAction) => {
       return this.authService.logout()
-        .map(res => new AuthLogOutSuccessAction(res))
+        .map(res => new AuthLogOutSuccessAction(action.payload))
         .catch(error => Observable.of(new AuthLogOutErrorAction({ error: error })));
     });
 
-  @Effect({ dispatch: false })
+  @Effect()
   authLogoutSuccess$ = this.actions$
     .ofType(AUTH_LOG_OUT_SUCCESS)
-    .map(() => this.redirectToLoginAction());
+    .map((action: AuthActions.AuthLogOutSuccessAction) =>
+      this.redirectToLoginAction(action.payload));
 
   // @Effect()
-  // logout$: Observable<any> = this.isAuthenticated$
+  // loggedOut$ = this.isAuthenticated$
   //   .filter((isAuthenticated) => !isAuthenticated)
-  //   .map(() => this.redirectToLoginAction());
+  //   .map(() => new AuthLogOutAction());
 
   @Effect()
   init$ = defer(() => {
@@ -76,7 +81,7 @@ export class AuthEffects {
     if (userData.userId) {
       return Observable.of(new AuthRefreshSessionAction(userData));
     } else {
-      return Observable.of(new AuthLogOutSuccessAction({}));
+      return Observable.of(new AuthLogOutSuccessAction());
     }
 
   });
@@ -87,11 +92,14 @@ export class AuthEffects {
     this.route.snapshot.queryParams['next'] !== 'login'
       ? this.route.snapshot.queryParams['next']
       : '';
-    setTimeout(() => this.router.navigateByUrl(next));
+    return new RoutingActions.Go({ path: [next] });
   };
 
-  public redirectToLoginAction() {
-    setTimeout(() => this.router.navigate(['login']));
+  public redirectToLoginAction(redirectionParams: NavigationExtras) {
+    return new RoutingActions.Go({
+      path: ['login'],
+      query: redirectionParams.queryParams
+    });
   };
 
   public handleError(error: any) {
@@ -106,7 +114,7 @@ export class AuthEffects {
     private router: Router,
     private authService: AuthService,
     private route: ActivatedRoute,
-    // private store: Store<TAppState>,
+    private store: Store<TAppState>,
     private notificationService: NotificationService
   ) {
   }

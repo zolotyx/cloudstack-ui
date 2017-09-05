@@ -1587,6 +1587,10 @@ deep-extend@~0.4.0:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.4.2.tgz#48b699c27e334bf89f10892be432f6e4c7d34a7f"
 
+deep-freeze-strict@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/deep-freeze-strict/-/deep-freeze-strict-1.1.1.tgz#77d0583ca24a69be4bbd9ac2fae415d55523e5b0"
+
 default-require-extensions@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/default-require-extensions/-/default-require-extensions-1.0.0.tgz#f37ea15d3e13ffd9b437d33e1a75b5fb97874cb8"
@@ -3680,6 +3684,12 @@ ng2-dragula@1.5.0:
   resolved "https://registry.yarnpkg.com/ng2-dragula/-/ng2-dragula-1.5.0.tgz#12a221d7a34fc629cc74dc98efb26448290eb6e5"
   dependencies:
     dragula "^3.7.2"
+
+ngrx-store-freeze@^0.1.9:
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/ngrx-store-freeze/-/ngrx-store-freeze-0.1.9.tgz#b20f18f21fd5efc4e1b1e05f6f279674d0f70c81"
+  dependencies:
+    deep-freeze-strict "^1.1.1"
 
 ngx-clipboard@^8.0.2:
   version "8.0.4"

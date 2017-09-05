@@ -35,6 +35,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'instances'
+    redirectTo: '/instances',
+    pathMatch: 'full'
   }
 ];

@@ -38,14 +38,14 @@ export const reducers = {
   router: fromRouter.routerReducer
 };
 
-const developmentReducer: ActionReducer<TAppState> = compose(storeFreeze, combineReducers)(reducers);
-const productionReducer: ActionReducer<TAppState> = combineReducers(reducers);
-
-export function reducer(state: any, action: any) {
-  // debugger;
-  if (environment.production) {
-    return productionReducer(state, action);
-  } else {
-    return developmentReducer(state, action);
-  }
-}
+// const developmentReducer: ActionReducer<TAppState> = compose(storeFreeze, combineReducers)(reducers);
+// const productionReducer: ActionReducer<TAppState> = combineReducers(reducers);
+//
+// export function reducer(state: any, action: any) {
+//   // debugger;
+//   if (environment.production) {
+//     return productionReducer(state, action);
+//   } else {
+//     return developmentReducer(state, action);
+//   }
+// }

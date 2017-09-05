@@ -83,7 +83,7 @@ export class AppComponent extends WithUnsubscribe() implements OnInit {
           this.notification.message('AUTH.NOT_LOGGED_IN');
           const route = this.routerUtilsService.getRouteWithoutQueryParams();
           if (route !== '/login' && route !== '/logout') {
-            this.store.dispatch(new AuthLogOutAction());
+            this.store.dispatch(new AuthLogOutAction(this.routerUtilsService.getRedirectionQueryParams()));
           }
           break;
       }

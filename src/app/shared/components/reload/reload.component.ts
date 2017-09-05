@@ -1,15 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
+import { TAppState } from '../../../auth/redux/reducers/index';
+import { Store } from '@ngrx/store';
+import { Back } from '../../../auth/redux/actions/router.actions';
 
 
 @Component({
   selector: 'cs-reload',
-  template: ''
+  template: '<div></div>'
 })
 export class ReloadComponent implements OnInit {
-  constructor(private location: Location) {}
+  constructor(private store: Store<TAppState>) {
+  }
 
   public ngOnInit(): void {
-    this.location.back();
+    this.store.dispatch(new Back());
   }
 }

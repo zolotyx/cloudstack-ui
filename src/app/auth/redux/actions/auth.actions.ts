@@ -41,6 +41,9 @@ export const AUTH_LOG_OUT = '[Auth] Log Out';
 
 export class AuthLogOutAction implements Action {
   readonly type = AUTH_LOG_OUT;
+
+  constructor(public payload: any) {
+  }
 }
 
 export const AUTH_LOG_OUT_SUCCESS = '[Auth] Log Out Success';
@@ -48,7 +51,7 @@ export const AUTH_LOG_OUT_SUCCESS = '[Auth] Log Out Success';
 export class AuthLogOutSuccessAction implements Action {
   readonly type = AUTH_LOG_OUT_SUCCESS;
 
-  constructor(public payload: any) {
+  constructor(public payload: any = {}) {
   }
 }
 
