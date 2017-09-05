@@ -12,3 +12,5 @@ export const getUsername = createSelector(getAuthState, state => state.username)
 export const getName = createSelector(getAuthState, state => state.name);
 
 export const getUserId = createSelector(getAuthState, state => state.userId);
+
+export const isLoading = createSelector(getAuthState, state => state.isLoading);

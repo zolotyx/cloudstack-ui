@@ -1,5 +1,4 @@
-import { MdlLayoutComponent } from '@angular-mdl/core';
-import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Response } from '@angular/http';
 import { Router } from '@angular/router';
 import '../style/app.scss';
@@ -18,6 +17,8 @@ import { ZoneService } from './shared/services/zone.service';
 import { Store } from '@ngrx/store';
 import { getName, isAuthenticated } from './auth/redux/selectors/auth.selectors';
 import { TAppState } from './auth/redux/reducers/index';
+import { WithUnsubscribe } from './utils/mixins/with-unsubscribe';
+import { AuthLogOutAction } from './auth/redux/actions/auth.actions';
 
 
 @Component({
@@ -25,14 +26,11 @@ import { TAppState } from './auth/redux/reducers/index';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
-  @ViewChild(MdlLayoutComponent) public layoutComponent: MdlLayoutComponent;
-  public loggedIn: boolean;
-  public title: string;
+export class AppComponent extends WithUnsubscribe() implements OnInit {
   public disableSecurityGroups = false;
 
   readonly loggedIn$ = this.store.select(isAuthenticated);
-  readonly username$ = this.store.select(getName);
+  readonly title$ = this.store.select(getName);
 
   constructor(
     private auth: AuthService,
@@ -51,17 +49,16 @@ export class AppComponent implements OnInit {
     private zoneService: ZoneService,
     private zone: NgZone
   ) {
-    this.title = this.auth.name;
+    super();
   }
 
   public ngOnInit(): void {
     this.loadSettings();
 
     this.error.subscribe(e => this.handleError(e));
-    this.auth.loggedIn.subscribe(isLoggedIn => {
-      this.loggedIn = isLoggedIn;
-      this.updateAccount(this.loggedIn);
-    // this.loggedIn$.subscribe(isLoggedIn => {
+    this.loggedIn$
+      .takeUntil(this.unsubscribe$)
+      .subscribe(isLoggedIn => {
       if (isLoggedIn) {
         this.auth.startInactivityCounter();
         this.loadSettings();
@@ -79,12 +76,6 @@ export class AppComponent implements OnInit {
     this.captureScrollEvents();
   }
 
-  private updateAccount(loggedIn: boolean): void {
-    if (loggedIn) {
-      this.title = this.auth.name;
-    }
-  }
-
   private handleError(e: any): void {
     if (e instanceof Response) {
       switch (e.status) {
@@ -92,10 +83,7 @@ export class AppComponent implements OnInit {
           this.notification.message('AUTH.NOT_LOGGED_IN');
           const route = this.routerUtilsService.getRouteWithoutQueryParams();
           if (route !== '/login' && route !== '/logout') {
-            this.router.navigate(
-              ['/logout'],
-              this.routerUtilsService.getRedirectionQueryParams()
-            );
+            this.store.dispatch(new AuthLogOutAction());
           }
           break;
       }

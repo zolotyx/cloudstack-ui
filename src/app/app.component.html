@@ -1,18 +1,18 @@
 <mdl-layout
-  [mdl-layout-fixed-drawer]="loggedIn ? true : null"
+  [mdl-layout-fixed-drawer]="loggedIn$ | async"
   #mainLayout="mdlLayout"
   mdl-layout-no-drawer-button
 >
   <mdl-layout-drawer
-    *ngIf="loggedIn"
+    *ngIf="loggedIn$ | async"
     class="mdl-color--grey-50 flex-container"
-    [class.drawer-open]="isDrawerOpen"
+    [class.drawer-open]="isDrawerOpen && (loggedIn$ | async)"
   >
-    <cs-app-sidebar [title]="title"></cs-app-sidebar>
+    <cs-app-sidebar [title]="title$ | async"></cs-app-sidebar>
   </mdl-layout-drawer>
   <mdl-layout-content
     class="mdl-color--grey-100"
-    [class.content-margin]="isDrawerOpen && loggedIn"
+    [class.content-margin]="isDrawerOpen && (loggedIn$ | async)"
   >
     <router-outlet></router-outlet>
   </mdl-layout-content>

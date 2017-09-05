@@ -145,10 +145,6 @@ export class AuthService extends BaseBackendService<BaseModelStub> {
     return obs;
   }
 
-  public isLoggedIn(): Observable<boolean> {
-    return Observable.of(!!this.userId);
-  }
-
   public sendRefreshRequest(): void {
     this.userService.getList().subscribe();
     // this.store.dispatch(new AuthRefreshSessionAction());

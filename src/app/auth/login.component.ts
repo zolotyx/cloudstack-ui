@@ -1,22 +1,26 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { ConfigService } from '../shared/services/config.service';
-import { Store } from '@ngrx/store';
-import { TAppState } from './redux/reducers/index';
-import { AuthLogInAction } from './redux/actions/auth.actions';
 
+export interface LoginData {
+  username: string,
+  domain: string,
+  password: string
+}
 
 @Component({
   selector: 'cs-login',
   templateUrl: './login.component.html',
-  styleUrls: ['login.component.scss'],
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
   @ViewChild('user') public usernameField;
   @ViewChild('pass') public passwordField;
 
+  @Input() public isLoading = false;
+  @Output() private onLogin = new EventEmitter<LoginData>();
   public username = '';
   public password = '';
   public domain = '';
@@ -25,7 +29,6 @@ export class LoginComponent implements OnInit {
   public showDomain = false;
 
   constructor(
-    private store: Store<TAppState>,
     private route: ActivatedRoute,
     private configService: ConfigService
   ) {
@@ -44,10 +47,11 @@ export class LoginComponent implements OnInit {
 
   public onSubmit(): void {
     if (this.username && this.password) {
-      this.store.dispatch(new AuthLogInAction({
+      this.onLogin.emit({
         username: this.username,
+        domain: this.domain,
         password: this.password
-      }));
+      });
       return;
     }
     if (!this.username) {

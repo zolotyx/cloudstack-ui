@@ -6,8 +6,8 @@ export const AUTH_REFRESH_SESSION = '[Auth] Refresh Session';
 export class AuthRefreshSessionAction implements Action {
   readonly type = AUTH_REFRESH_SESSION;
 
-  // constructor(public payload: any) {
-  // }
+  constructor(public payload: any) {
+  }
 }
 
 export const AUTH_LOG_IN = '[Auth] Log In';
@@ -76,6 +76,7 @@ export class BootstrapAction implements Action {
 
 export type Actions = AuthRefreshSessionAction
   | AuthLogInAction
+  | AuthLogInErrorAction
   | AuthLogInSuccessAction
   | AuthLogOutAction
   | AuthLogOutSuccessAction

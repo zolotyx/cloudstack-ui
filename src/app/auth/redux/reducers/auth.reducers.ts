@@ -1,15 +1,17 @@
 import {
-  // AUTH_LOG_IN,
+  AUTH_LOG_IN,
   AUTH_LOG_IN_SUCCESS,
   AUTH_LOG_OUT, AUTH_REFRESH_SESSION,
   AUTH_SESSION_EXPIRED,
-  AUTH_LOG_OUT_SUCCESS
+  AUTH_LOG_OUT_SUCCESS,
+  AUTH_LOG_IN_ERROR
 } from '../actions/auth.actions';
 // import { Action } from '@ngrx/store';
 import * as auth from '../actions/auth.actions';
 
 export interface TAuthState {
   // authenticated: boolean,
+  isLoading: boolean,
   username: string,
   userId: string,
   name: string
@@ -17,20 +19,38 @@ export interface TAuthState {
 
 const INITIAL_STATE: TAuthState = {
   // authenticated: false,
+  isLoading: false,
   name: '',
   userId: '',
   username: ''
 };
 
-export const authReducer = (state: TAuthState = INITIAL_STATE, action: auth.Actions): TAuthState => {
+export function authReducer(
+  state: TAuthState = INITIAL_STATE,
+  action: auth.Actions
+): TAuthState {
   switch (action.type) {
 
     case AUTH_REFRESH_SESSION: {
       return {
         ...state,
-        name: `${action.payload.firstname} ${action.payload.lastname}`,
+        name: action.payload.name,
         username: action.payload.username,
-        userId: action.payload.id
+        userId: action.payload.userId
+      };
+    }
+
+    case AUTH_LOG_IN: {
+      return {
+        ...state,
+        isLoading: true
+      };
+    }
+
+    case AUTH_LOG_IN_ERROR: {
+      return {
+        ...state,
+        isLoading: false
       };
     }
 
@@ -38,6 +58,7 @@ export const authReducer = (state: TAuthState = INITIAL_STATE, action: auth.Acti
       // debugger;
       return {
         ...state,
+        isLoading: false,
         name: `${action.payload.firstname} ${action.payload.lastname}`,
         username: action.payload.username,
         userId: action.payload.userid
@@ -75,4 +96,4 @@ export const authReducer = (state: TAuthState = INITIAL_STATE, action: auth.Acti
       return state;
     }
   }
-};
+}
