@@ -13,6 +13,7 @@ import { NotificationService } from './shared/services/notification.service';
 import { RouterUtilsService } from './shared/services/router-utils.service';
 import { SessionStorageService } from './shared/services/session-storage.service';
 import { StyleService } from './shared/services/style.service';
+import { UserService } from './shared/services/user.service';
 import { ZoneService } from './shared/services/zone.service';
 import { Store } from '@ngrx/store';
 import { getName, isAuthenticated } from './auth/redux/selectors/auth.selectors';
@@ -20,13 +21,13 @@ import { TAppState } from './auth/redux/reducers/index';
 import { WithUnsubscribe } from './utils/mixins/with-unsubscribe';
 import { AuthLogOutAction } from './auth/redux/actions/auth.actions';
 
-
 @Component({
   selector: 'cs-app',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent extends WithUnsubscribe() implements OnInit {
+export class AppComponent extends WithUnsubscribe()implements OnInit {
+
   public disableSecurityGroups = false;
 
   readonly loggedIn$ = this.store.select(isAuthenticated);
@@ -45,6 +46,7 @@ export class AppComponent extends WithUnsubscribe() implements OnInit {
     private layoutService: LayoutService,
     private notification: NotificationService,
     private styleService: StyleService,
+    private userService: UserService,
     private routerUtilsService: RouterUtilsService,
     private zoneService: ZoneService,
     private zone: NgZone
@@ -60,13 +62,13 @@ export class AppComponent extends WithUnsubscribe() implements OnInit {
       .takeUntil(this.unsubscribe$)
       .subscribe(isLoggedIn => {
       if (isLoggedIn) {
-        this.auth.startInactivityCounter();
+        this.userService.startInactivityCounter();
         this.loadSettings();
         this.zoneService
           .areAllZonesBasic()
           .subscribe(basic => (this.disableSecurityGroups = basic));
       } else {
-        this.auth.clearInactivityTimer();
+        this.userService.clearInactivityTimer();
       }
       this.asyncJobService.completeAllJobs();
       this.cacheService.invalidateAll();

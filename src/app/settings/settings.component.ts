@@ -21,7 +21,6 @@ import { TAppState } from '../auth/redux/reducers/index';
   styleUrls: ['settings.component.scss']
 })
 export class SettingsComponent extends WithUnsubscribe() implements OnInit {
-  readonly userId$ = this.store.select(getUserId);
   public userId: string;
   public accentColor: Color;
   public firstDayOfWeek = 1;
@@ -65,7 +64,7 @@ export class SettingsComponent extends WithUnsubscribe() implements OnInit {
     private store: Store<TAppState>
   ) {
     super();
-    this.userId = this.authService.userId;
+    this.userId = this.authService.user.userId;
   }
 
   public ngOnInit(): void {
@@ -134,12 +133,11 @@ export class SettingsComponent extends WithUnsubscribe() implements OnInit {
   }
 
   public updatePassword(): void {
-    this.userId$.switchMap(userId => {
-      return this.userService.updatePassword(userId, this.password);
-    }).subscribe(
-      () => this.notificationService.message('PASSWORD_CHANGED_SUCCESSFULLY'),
-      error => this.notificationService.error(error.errortext)
-    );
+    this.userService.updatePassword(this.userId, this.password)
+      .subscribe(
+        () => this.notificationService.message('SETTINGS.SECURITY.PASSWORD_CHANGED_SUCCESSFULLY'),
+        error => this.notificationService.error(error.errortext)
+      );
     this.passwordUpdateForm.reset();
   }
 

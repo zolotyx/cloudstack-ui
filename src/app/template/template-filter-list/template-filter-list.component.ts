@@ -1,5 +1,5 @@
 import {
-  Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output,
+  Component, EventEmitter, Input, OnChanges,OnDestroy, OnInit, Output,
   SimpleChanges
 } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -8,7 +8,6 @@ import { Subscription } from 'rxjs/Subscription';
 import { OsFamily } from '../../shared/models/os-type.model';
 import { Zone } from '../../shared/models/zone.model';
 import { AuthService } from '../../shared/services/auth.service';
-import { ServiceLocator } from '../../shared/services/service-locator';
 import { BaseTemplateModel } from '../shared/base-template.model';
 import { TemplateFilters } from '../shared/base-template.service';
 import { Iso } from '../shared/iso.model';
@@ -52,7 +51,9 @@ export class TemplateFilterListComponent implements OnInit, OnDestroy, OnChanges
     }
   ];
 
-  protected authService = ServiceLocator.injector.get(AuthService);
+  constructor(protected authService: AuthService) {
+
+  }
 
   constructor(protected store: Store<TAppState>) {}
 
@@ -118,13 +119,15 @@ export class TemplateFilterListComponent implements OnInit, OnDestroy, OnChanges
   }
 
   private filterByCategories(templateList: Array<BaseTemplateModel>): Array<BaseTemplateModel> {
+    const username = this.authService.user && this.authService.user.username || '';
+
     return templateList
       .filter(template => {
         const featuredFilter = !this.selectedFilters || !this.selectedFilters.length ||
           this.selectedFilters.includes(TemplateFilters.featured) || !template.isFeatured;
         const selfFilter = !this.selectedFilters || !this.selectedFilters.length ||
           this.selectedFilters.includes(TemplateFilters.self) ||
-          !(template.account === this.username);
+          !(template.account === username);
         const osFilter = !this.selectedOsFamilies || !this.selectedOsFamilies.length ||
           this.selectedOsFamilies.includes(template.osType.osFamily);
         return featuredFilter && selfFilter && osFilter;

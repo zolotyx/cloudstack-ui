@@ -1,12 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core';
+import { MD_DIALOG_DATA, MdDialogRef } from '@angular/material';
 
+import { AuthService } from '../../../shared/services/auth.service';
 import { Template } from '../../../template/shared';
 import { BaseTemplateModel } from '../../../template/shared/base-template.model';
 import { Iso } from '../../../template/shared/iso.model';
 import { TemplateFilterListComponent } from '../../../template/template-filter-list/template-filter-list.component';
-import { MD_DIALOG_DATA, MdDialogRef } from '@angular/material';
-import { TAppState } from '../../../auth/redux/reducers/index';
-import { Store } from '@ngrx/store';
 
 
 @Component({
@@ -24,9 +23,9 @@ export class VmTemplateDialogComponent extends TemplateFilterListComponent imple
   constructor(
     @Inject(MD_DIALOG_DATA) data,
     private dialogRef: MdDialogRef<VmTemplateDialogComponent>,
-    public store: Store<TAppState>
+    authService: AuthService
   ) {
-    super(store);
+    super(authService);
 
     this.preselectedTemplate = data.template;
     this.templates = data.templates;
