@@ -1,16 +1,16 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 import { AsyncJobService } from '../../shared/services/async-job.service';
 import { BaseBackendCachedService } from '../../shared/services/base-backend-cached.service';
+import { CacheService } from '../../shared/services/cache.service';
+import { ErrorService } from '../../shared/services/error.service';
 import { OsTypeService } from '../../shared/services/os-type.service';
 import { TemplateTagService } from '../../shared/services/tags/template-tag.service';
 import { Utils } from '../../shared/services/utils.service';
 import { BaseTemplateModel } from './base-template.model';
-import { CacheService } from '../../shared/services/cache.service';
-import { ErrorService } from '../../shared/services/error.service';
-import { Subject } from 'rxjs/Subject';
 
 export const TemplateFilters = {
   community: 'community',
@@ -74,7 +74,7 @@ export abstract class BaseTemplateService extends BaseBackendCachedService<BaseT
     protected osTypeService: OsTypeService,
     protected templateTagService: TemplateTagService,
     public errorService: ErrorService,
-    public http: Http,
+    public http: HttpClient,
     public cacheService: CacheService
   ) {
     super(cacheService, errorService, http);

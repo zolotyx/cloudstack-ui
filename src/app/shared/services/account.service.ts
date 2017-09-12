@@ -1,9 +1,9 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BackendResource } from '../decorators/backend-resource.decorator';
 import { Account } from '../models/account.model';
 import { BaseBackendService } from './base-backend.service';
 import { CacheService } from './cache.service';
-import { Http } from '@angular/http';
 import { ErrorService } from './error.service';
 
 @Injectable()
@@ -12,9 +12,11 @@ import { ErrorService } from './error.service';
   entityModel: Account
 })
 export class AccountService extends BaseBackendService<Account> {
-  constructor(public errorService: ErrorService,
-              public http: Http,
-              public cacheService: CacheService) {
+  constructor(
+    public errorService: ErrorService,
+    public http: HttpClient,
+    public cacheService: CacheService
+  ) {
     super(cacheService, errorService, http);
   }
 }

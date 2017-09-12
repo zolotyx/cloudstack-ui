@@ -1,15 +1,14 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Subject } from 'rxjs/Subject';
+import { BackendResource } from '../decorators';
 
 import { AsyncJob } from '../models';
 import { BaseBackendService } from './base-backend.service';
-import { BackendResource } from '../decorators';
-import { ErrorService } from './error.service';
 import { CacheService } from './cache.service';
-
+import { ErrorService } from './error.service';
 
 const enum JobStatus {
   InProgress,
@@ -29,16 +28,22 @@ export class AsyncJobService extends BaseBackendService<AsyncJob<any>> {
   private timerIds: Array<any> = [];
   private jobs: Array<Subject<AsyncJob<any>>> = [];
 
-  constructor(public errorService: ErrorService,
-              public http: Http,
-              public cacheService: CacheService) {
+  constructor(
+    public errorService: ErrorService,
+    public http: HttpClient,
+    public cacheService: CacheService
+  ) {
     super(cacheService, errorService, http);
     this.pollingInterval = 2000;
     this.immediatePollingInterval = 100;
     this.event = new Subject<AsyncJob<any>>();
   }
 
-  public queryJob(job: any, entity = '', entityModel: any = null): Observable<typeof entityModel> {
+  public queryJob(
+    job: any,
+    entity = '',
+    entityModel: any = null
+  ): Observable<typeof entityModel> {
     const jobId = this.getJobId(job);
     const jobObservable = Observable.create(observer => {
       let interval;
@@ -76,7 +81,7 @@ export class AsyncJobService extends BaseBackendService<AsyncJob<any>> {
   ): void {
     this.sendCommand('query;Result', { jobId })
       .map(res => new AsyncJob<typeof entityModel>(res))
-      .subscribe((asyncJob) => {
+      .subscribe(asyncJob => {
         switch (asyncJob.status) {
           case JobStatus.InProgress:
             return;
@@ -84,7 +89,9 @@ export class AsyncJobService extends BaseBackendService<AsyncJob<any>> {
             observer.next(this.getResult(asyncJob, entity, entityModel));
             break;
           case JobStatus.Failed: {
-            observer.error(ErrorService.parseError(this.getResponse({ error: asyncJob.result })));
+            observer.error(
+              ErrorService.parseError(this.getResponse({ error: asyncJob.result }))
+            );
             break;
           }
         }

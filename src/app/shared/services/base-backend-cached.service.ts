@@ -1,35 +1,41 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Http } from '@angular/http';
 
 import { BaseModel } from '../models';
-import { CacheService } from './cache.service';
 import { ApiFormat, BaseBackendService } from './base-backend.service';
 import { Cache } from './cache';
+import { CacheService } from './cache.service';
 import { ErrorService } from './error.service';
 
-
+@Injectable()
 export abstract class BaseBackendCachedService<M extends BaseModel> extends BaseBackendService<M> {
   private cache: Cache<Array<M>>;
 
-  constructor(protected cacheService: CacheService,
-              public errorService: ErrorService,
-              public http: Http) {
+  constructor(
+    protected cacheService: CacheService,
+    public errorService: ErrorService,
+    public http: HttpClient
+  ) {
     super(cacheService, errorService, http);
     this.initDataCache();
   }
 
-  public getList(params?: {}, customApiFormat?: ApiFormat, useCache = true): Observable<Array<M>> {
+  public getList(
+    params?: {},
+    customApiFormat?: ApiFormat,
+    useCache = true
+  ): Observable<Array<M>> {
     if (useCache) {
       const cachedResult = this.cache.get(params);
       if (cachedResult) {
         return Observable.of(cachedResult);
       }
     }
-    return super.getList(params, customApiFormat)
-      .map(result => {
-        this.cache.set({ params, result });
-        return result;
-      });
+    return super.getList(params, customApiFormat).map(result => {
+      this.cache.set({ params, result });
+      return result;
+    });
   }
 
   public create(params?: {}): Observable<any> {

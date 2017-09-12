@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { NgZone } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 
@@ -8,9 +7,9 @@ import { BackendResource } from '../decorators';
 import { User } from '../models/user.model';
 import { BaseBackendService } from './base-backend.service';
 import { CacheService } from './cache.service';
-import { ErrorService } from './error.service';
 
 import { ConfigService } from './config.service';
+import { ErrorService } from './error.service';
 import { RouterUtilsService } from './router-utils.service';
 import { UserTagService } from './tags/user-tag.service';
 
@@ -35,7 +34,7 @@ export class UserService extends BaseBackendService<User> {
     protected zone: NgZone,
     public cacheService: CacheService,
     public errorService: ErrorService,
-    public http: Http
+    public http: HttpClient
   ) {
     super(cacheService, errorService, http);
   }

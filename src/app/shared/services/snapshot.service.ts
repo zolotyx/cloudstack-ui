@@ -1,15 +1,15 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+
 import { BackendResource } from '../decorators/backend-resource.decorator';
 import { Snapshot } from '../models/snapshot.model';
 import { AsyncJobService } from './async-job.service';
 import { BaseBackendCachedService } from './base-backend-cached.service';
-import { SnapshotTagService } from './tags/snapshot-tag.service';
 import { CacheService } from './cache.service';
 import { ErrorService } from './error.service';
-import { Subject } from 'rxjs/Subject';
+import { SnapshotTagService } from './tags/snapshot-tag.service';
 
 @Injectable()
 @BackendResource({
@@ -24,7 +24,7 @@ export class SnapshotService extends BaseBackendCachedService<Snapshot> {
     private snapshotTagService: SnapshotTagService,
     public cacheService: CacheService,
     public errorService: ErrorService,
-    public http: Http
+    public http: HttpClient
   ) {
     super(cacheService, errorService, http);
   }

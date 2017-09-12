@@ -1,5 +1,5 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { BackendResource } from '../decorators';
@@ -7,7 +7,6 @@ import { OsFamily, OsType } from '../models/os-type.model';
 import { BaseBackendService } from './base-backend.service';
 import { CacheService } from './cache.service';
 import { ErrorService } from './error.service';
-
 
 @Injectable()
 @BackendResource({
@@ -18,9 +17,11 @@ export class OsTypeService extends BaseBackendService<OsType> {
   private osTypes: Array<OsType>;
   private requestObservable: Observable<Array<OsType>>;
 
-  constructor(public cacheService: CacheService,
-              public errorService: ErrorService,
-              public http: Http) {
+  constructor(
+    public cacheService: CacheService,
+    public errorService: ErrorService,
+    public http: HttpClient
+  ) {
     super(cacheService, errorService, http);
   }
 
@@ -41,15 +42,14 @@ export class OsTypeService extends BaseBackendService<OsType> {
       return this.requestObservable;
     }
 
-    this.requestObservable = super.getList(params)
-      .map(osTypes => {
-        osTypes.forEach(osType => {
-          osType.osFamily = this.mapOsFamily(osType.description);
-        });
-
-        this.osTypes = osTypes;
-        return osTypes;
+    this.requestObservable = super.getList(params).map(osTypes => {
+      osTypes.forEach(osType => {
+        osType.osFamily = this.mapOsFamily(osType.description);
       });
+
+      this.osTypes = osTypes;
+      return osTypes;
+    });
     return this.requestObservable;
   }
 
@@ -69,8 +69,12 @@ export class OsTypeService extends BaseBackendService<OsType> {
       return linux;
     }
 
-    if (osName.includes('CentOS') || osName.includes('Debian') ||
-      osName.includes('Fedora') || osName.includes('Ubuntu')) {
+    if (
+      osName.includes('CentOS') ||
+      osName.includes('Debian') ||
+      osName.includes('Fedora') ||
+      osName.includes('Ubuntu')
+    ) {
       return linux;
     }
 

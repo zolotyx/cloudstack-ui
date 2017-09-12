@@ -1,15 +1,13 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
+import { Offering } from '../models/offering.model';
 
 import { Zone } from '../models/zone.model';
 import { BaseBackendService } from './base-backend.service';
-import { ConfigService } from './config.service';
-import { ServiceLocator } from './service-locator';
-import { Offering } from '../models/offering.model';
 import { CacheService } from './cache.service';
+import { ConfigService } from './config.service';
 import { ErrorService } from './error.service';
-
 
 export interface OfferingAvailability {
   [zoneId: string]: {
@@ -21,13 +19,13 @@ export interface OfferingAvailability {
 
 @Injectable()
 export abstract class OfferingService<T extends Offering> extends BaseBackendService<T> {
-  protected configService: ConfigService;
-
-  constructor(public cacheService: CacheService,
-              public errorService: ErrorService,
-              public http: Http) {
+  constructor(
+    public cacheService: CacheService,
+    protected configService: ConfigService,
+    public errorService: ErrorService,
+    public http: HttpClient
+  ) {
     super(cacheService, errorService, http);
-    this.configService = ServiceLocator.injector.get(ConfigService);
   }
 
   public get(id: string): Observable<T> {
@@ -44,14 +42,13 @@ export abstract class OfferingService<T extends Offering> extends BaseBackendSer
 
     const offeringAvailability = this.configService.get('offeringAvailability');
 
-    return super.getList(modifiedParams)
-      .map(offeringList => {
-        return this.getOfferingsAvailableInZone(
-          offeringList,
-          offeringAvailability,
-          zone
-        );
-      });
+    return super.getList(modifiedParams).map(offeringList => {
+      return this.getOfferingsAvailableInZone(
+        offeringList,
+        offeringAvailability,
+        zone
+      );
+    });
   }
 
   public getOfferingsAvailableInZone(
@@ -63,12 +60,16 @@ export abstract class OfferingService<T extends Offering> extends BaseBackendSer
       return offeringList;
     }
 
-    return offeringList
-      .filter(offering => {
-        const offeringAvailableInZone = this.isOfferingAvailableInZone(offering, offeringAvailability, zone);
-        const localStorageCompatibility = zone.localStorageEnabled || !offering.isLocal;
-        return offeringAvailableInZone && localStorageCompatibility;
-      });
+    return offeringList.filter(offering => {
+      const offeringAvailableInZone = this.isOfferingAvailableInZone(
+        offering,
+        offeringAvailability,
+        zone
+      );
+      const localStorageCompatibility =
+        zone.localStorageEnabled || !offering.isLocal;
+      return offeringAvailableInZone && localStorageCompatibility;
+    });
   }
 
   protected abstract isOfferingAvailableInZone(

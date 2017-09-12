@@ -1,18 +1,18 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { CacheService } from 'app/shared/services/cache.service';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { BackendResource } from '../decorators';
 import { BaseModelStub } from '../models';
+import { AccountType } from '../models/account.model';
 import { User } from '../models/user.model';
 import { AsyncJobService } from './async-job.service';
 import { BaseBackendService } from './base-backend.service';
-import { LocalStorageService } from './local-storage.service';
-import { Http } from '@angular/http';
 import { ErrorService } from './error.service';
-import { CacheService } from 'app/shared/services/cache.service';
-import { AccountType } from '../models/account.model';
+import { LocalStorageService } from './local-storage.service';
+import { Utils } from './utils.service';
 
 @Injectable()
 @BackendResource({
@@ -27,16 +27,15 @@ export class AuthService extends BaseBackendService<BaseModelStub> {
     protected storage: LocalStorageService,
     public cacheService: CacheService,
     public errorService: ErrorService,
-    public http: Http
+    public http: HttpClient
   ) {
     super(cacheService, errorService, http);
 
-    const userRaw = this.storage.read('user');
-    if (userRaw) {
-      try {
-        const user = JSON.parse(userRaw);
-        this._user = new User(user);
-      } catch (e) {}
+    try {
+      const userRaw = this.storage.read('user');
+      const user = Utils.parseJsonString(userRaw);
+      this._user = new User(user);
+    } catch (e) {
     }
   }
 

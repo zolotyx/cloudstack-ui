@@ -1,5 +1,5 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { BackendResource } from '../../decorators/backend-resource.decorator';
@@ -7,9 +7,8 @@ import { Taggable } from '../../interfaces/taggable.interface';
 import { Tag } from '../../models/tag.model';
 import { AsyncJobService } from '../async-job.service';
 import { BaseBackendCachedService } from '../base-backend-cached.service';
-import { ErrorService } from '../error.service';
 import { CacheService } from '../cache.service';
-
+import { ErrorService } from '../error.service';
 
 @Injectable()
 @BackendResource({
@@ -17,51 +16,61 @@ import { CacheService } from '../cache.service';
   entityModel: Tag
 })
 export class TagService extends BaseBackendCachedService<Tag> {
-  constructor(private asyncJob: AsyncJobService,
-              public errorService: ErrorService,
-              public http: Http,
-              public cacheService: CacheService) {
+  constructor(
+    private asyncJob: AsyncJobService,
+    public errorService: ErrorService,
+    public http: HttpClient,
+    public cacheService: CacheService
+  ) {
     super(cacheService, errorService, http);
   }
 
   public create(params?: {}): Observable<any> {
-    return super.create(params)
+    return super
+      .create(params)
       .switchMap(tagJob => this.asyncJob.queryJob(tagJob.jobid))
       .do(() => this.invalidateCache());
   }
 
   public remove(params?: {}): Observable<any> {
-    return super.remove(params)
+    return super
+      .remove(params)
       .switchMap(tagJob => this.asyncJob.queryJob(tagJob.jobid))
       .catch(() => Observable.of(null))
       .do(() => this.invalidateCache());
   }
 
   public getList(params?: {}): Observable<Array<Tag>> {
-    const customApiFormat = {command: 'list', entity: 'Tag'};
+    const customApiFormat = { command: 'list', entity: 'Tag' };
     return super.getList(params, customApiFormat);
   }
 
   public getTag(entity: any, key: string): Observable<Tag> {
-    return this.getList({resourceId: entity.id, key})
-      .map(tags => tags[0]);
+    return this.getList({ resourceId: entity.id, key }).map(tags => tags[0]);
   }
 
-  public update(entity: any, entityName: string, key: string, value: any): Observable<any> {
+  public update(
+    entity: any,
+    entityName: string,
+    key: string,
+    value: any
+  ): Observable<any> {
     const createObs = this.create({
       resourceIds: entity.id,
       resourceType: entityName,
       'tags[0].key': key,
-      'tags[0].value': value,
+      'tags[0].value': value
     })
       .map(() => {
         if (entity.tags) {
-          entity.tags.push(new Tag({
-            resourceId: entity.id,
-            resourceType: entityName,
-            key,
-            value
-          }));
+          entity.tags.push(
+            new Tag({
+              resourceId: entity.id,
+              resourceType: entityName,
+              key,
+              value
+            })
+          );
         }
         return entity;
       })
@@ -75,7 +84,7 @@ export class TagService extends BaseBackendCachedService<Tag> {
           'tags[0].key': key,
           'tags[0].value': tag.value || ''
         })
-          .map(() => entity.tags = entity.tags.filter(t => tag.key !== t.key))
+          .map(() => (entity.tags = entity.tags.filter(t => tag.key !== t.key)))
           .switchMap(() => createObs);
       })
       .catch(() => createObs);
@@ -83,12 +92,7 @@ export class TagService extends BaseBackendCachedService<Tag> {
 
   public copyTagsToEntity(tags: Array<Tag>, entity: Taggable): Observable<any> {
     const copyRequests = tags.map(tag => {
-      return this.update(
-        entity,
-        entity.resourceType,
-        tag.key,
-        tag.value
-      );
+      return this.update(entity, entity.resourceType, tag.key, tag.value);
     });
 
     if (!copyRequests.length) {

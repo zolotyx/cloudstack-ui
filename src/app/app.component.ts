@@ -1,9 +1,11 @@
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
-import { Response } from '@angular/http';
-import { Router } from '@angular/router';
+import { HttpResponse } from '@angular/common/http';
+import { Component, NgZone, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 import '../style/app.scss';
+import { AuthLogOutAction } from './auth/redux/actions/auth.actions';
+import { TAppState } from './auth/redux/reducers/index';
+import { getName, isAuthenticated } from './auth/redux/selectors/auth.selectors';
 import { AsyncJobService } from './shared/services/async-job.service';
-import { AuthService } from './shared/services/auth.service';
 import { CacheService } from './shared/services/cache.service';
 import { ErrorService } from './shared/services/error.service';
 import { LanguageService } from './shared/services/language.service';
@@ -15,18 +17,14 @@ import { SessionStorageService } from './shared/services/session-storage.service
 import { StyleService } from './shared/services/style.service';
 import { UserService } from './shared/services/user.service';
 import { ZoneService } from './shared/services/zone.service';
-import { Store } from '@ngrx/store';
-import { getName, isAuthenticated } from './auth/redux/selectors/auth.selectors';
-import { TAppState } from './auth/redux/reducers/index';
 import { WithUnsubscribe } from './utils/mixins/with-unsubscribe';
-import { AuthLogOutAction } from './auth/redux/actions/auth.actions';
 
 @Component({
   selector: 'cs-app',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent extends WithUnsubscribe()implements OnInit {
+export class AppComponent extends WithUnsubscribe() implements OnInit {
 
   public disableSecurityGroups = false;
 
@@ -34,8 +32,6 @@ export class AppComponent extends WithUnsubscribe()implements OnInit {
   readonly title$ = this.store.select(getName);
 
   constructor(
-    private auth: AuthService,
-    private router: Router,
     private store: Store<TAppState>,
     private error: ErrorService,
     private languageService: LanguageService,
@@ -61,25 +57,25 @@ export class AppComponent extends WithUnsubscribe()implements OnInit {
     this.loggedIn$
       .takeUntil(this.unsubscribe$)
       .subscribe(isLoggedIn => {
-      if (isLoggedIn) {
-        this.userService.startInactivityCounter();
-        this.loadSettings();
-        this.zoneService
-          .areAllZonesBasic()
-          .subscribe(basic => (this.disableSecurityGroups = basic));
-      } else {
-        this.userService.clearInactivityTimer();
-      }
-      this.asyncJobService.completeAllJobs();
-      this.cacheService.invalidateAll();
-      this.storageReset();
+        if (isLoggedIn) {
+          this.userService.startInactivityCounter();
+          this.loadSettings();
+          this.zoneService
+            .areAllZonesBasic()
+            .subscribe(basic => (this.disableSecurityGroups = basic));
+        } else {
+          this.userService.clearInactivityTimer();
+        }
+        this.asyncJobService.completeAllJobs();
+        this.cacheService.invalidateAll();
+        this.storageReset();
     });
 
     this.captureScrollEvents();
   }
 
   private handleError(e: any): void {
-    if (e instanceof Response) {
+    if (e instanceof HttpResponse) {
       switch (e.status) {
         case 401:
           this.notification.message('AUTH.NOT_LOGGED_IN');

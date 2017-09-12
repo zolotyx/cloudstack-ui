@@ -1,5 +1,5 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
@@ -9,7 +9,12 @@ import { AsyncJob, OsType, ServiceOffering, Volume } from '../../shared/models';
 import { InstanceGroup } from '../../shared/models/instance-group.model';
 import { VolumeType } from '../../shared/models/volume.model';
 import { AsyncJobService } from '../../shared/services/async-job.service';
-import { ApiFormat, BaseBackendService } from '../../shared/services/base-backend.service';
+import {
+  ApiFormat,
+  BaseBackendService
+} from '../../shared/services/base-backend.service';
+import { CacheService } from '../../shared/services/cache.service';
+import { ErrorService } from '../../shared/services/error.service';
 import { OsTypeService } from '../../shared/services/os-type.service';
 import { SecurityGroupService } from '../../shared/services/security-group.service';
 import { ServiceOfferingService } from '../../shared/services/service-offering.service';
@@ -19,8 +24,6 @@ import { Iso } from '../../template/shared';
 import { VmActions } from '../vm-actions/vm-action';
 import { IVirtualMachineCommand } from '../vm-actions/vm-command';
 import { VirtualMachine, VmState } from './vm.model';
-import { CacheService } from '../../shared/services/cache.service';
-import { ErrorService } from '../../shared/services/error.service';
 
 
 export const VirtualMachineEntityName = 'VirtualMachine';
@@ -42,7 +45,7 @@ export class VmService extends BaseBackendService<VirtualMachine> {
     private volumeService: VolumeService,
     public cacheService: CacheService,
     public errorService: ErrorService,
-    public http: Http
+    public http: HttpClient
   ) {
     super(cacheService, errorService, http);
   }

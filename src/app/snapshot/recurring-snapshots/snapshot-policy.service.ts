@@ -1,18 +1,17 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { BackendResource } from '../../shared/decorators';
 import { BaseBackendService } from '../../shared/services/base-backend.service';
+import { CacheService } from '../../shared/services/cache.service';
+import { ErrorService } from '../../shared/services/error.service';
 import { padStart } from '../../shared/utils/padStart';
 import { DayPeriod } from './day-period/day-period.component';
 import { Policy, TimePolicy } from './policy-editor/policy-editor.component';
 import { PolicyType } from './recurring-snapshots.component';
 import { SnapshotPolicy } from './snapshot-policy.model';
 import { Time } from './time-picker/time-picker.component';
-import { CacheService } from '../../shared/services/cache.service';
-import { ErrorService } from '../../shared/services/error.service';
-
 
 export interface SnapshotPolicyCreationParams {
   policy: Policy<TimePolicy>;
@@ -26,17 +25,17 @@ export interface SnapshotPolicyCreationParams {
   entityModel: SnapshotPolicy
 })
 export class SnapshotPolicyService extends BaseBackendService<SnapshotPolicy> {
-  constructor(public cacheService: CacheService,
-              public errorService: ErrorService,
-              public http: Http) {
+  constructor(
+    public cacheService: CacheService,
+    public errorService: ErrorService,
+    public http: HttpClient
+  ) {
     super(cacheService, errorService, http);
   }
 
   public getPolicyList(volumeId: string): Observable<Array<Policy<TimePolicy>>> {
-    return super.getList(
-      { volumeId },
-      { command: 'list', entity: 'SnapshotPolicies' }
-    )
+    return super
+      .getList({ volumeId }, { command: 'list', entity: 'SnapshotPolicies' })
       .map(policies => {
         return policies.map(_ => this.transformPolicy(_));
       });
@@ -68,7 +67,7 @@ export class SnapshotPolicyService extends BaseBackendService<SnapshotPolicy> {
         return {
           hour: 0,
           minute: time.minute
-        }
+        };
       } else {
         return time;
       }
@@ -77,12 +76,12 @@ export class SnapshotPolicyService extends BaseBackendService<SnapshotPolicy> {
         return {
           hour: 12,
           minute: time.minute
-        }
+        };
       } else {
         return {
           hour: time.hour + 12,
           minute: time.minute
-        }
+        };
       }
     }
   }
@@ -110,12 +109,13 @@ export class SnapshotPolicyService extends BaseBackendService<SnapshotPolicy> {
     const weekDay = policy.timePolicy.dayOfWeek;
     const monthDay = policy.timePolicy.dayOfMonth;
 
-    return [minutes, hours, weekDay, monthDay]
-      .filter(_ => _ != null)
-      .join(':');
+    return [minutes, hours, weekDay, monthDay].filter(_ => _ != null).join(':');
   }
 
-  private transformScheduleToTimePolicy(schedule: string, policyType: PolicyType): TimePolicy {
+  private transformScheduleToTimePolicy(
+    schedule: string,
+    policyType: PolicyType
+  ): TimePolicy {
     const parsedSchedule = schedule.split(':');
 
     switch (parsedSchedule.length) {
@@ -152,7 +152,10 @@ export class SnapshotPolicyService extends BaseBackendService<SnapshotPolicy> {
     return {
       id: policy.id,
       storedSnapshots: policy.maxSnaps,
-      timePolicy: this.transformScheduleToTimePolicy(policy.schedule, policy.intervalType),
+      timePolicy: this.transformScheduleToTimePolicy(
+        policy.schedule,
+        policy.intervalType
+      ),
       timeZone: { geo: policy.timeZone },
       type: policy.intervalType
     };
