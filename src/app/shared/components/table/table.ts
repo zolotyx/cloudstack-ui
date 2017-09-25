@@ -10,11 +10,11 @@ export class TableDatabase {
   }
 
   constructor(private list: Array<any>) {
-    this.init();
+    this.update(this.list);
   }
 
-  private init() {
-    this.dataChange.next(this.list);
+  public update(list: Array<any> = []) {
+    this.dataChange.next(list);
   }
 }
 

@@ -52,7 +52,7 @@
         *ngIf="visibleEvents?.length"
         [tableId]="'EVENT_PAGE'"
         [columns]="tableColumns"
-        [table-model]="tableModel"
+        [model]="tableModel"
         [searchQuery]="query"
       ></cs-table>
       <span *ngIf="!visibleEvents?.length">{{ 'EVENT_PAGE.NO_EVENTS' | translate }}</span>

@@ -7,21 +7,20 @@ import { TableDatabase, TableDataSource } from './table';
   templateUrl: 'table.component.html'
 })
 export class TableComponent implements OnChanges {
-  @Input('table-model') public model: any[];
+  @Input() public model: any[];
   @Input() public columns: string[];
-  @Input('table-model-selected') public selected: any;
+  @Input() public selected: any;
   @Input() public tableId: string;
   @Input() public selectable = false;
   @Input() public searchQuery: string;
   @Output() public selectionChange = new EventEmitter();
   public displayedColumns = [];
-  public dataSource: TableDataSource | null;
-  public database: TableDatabase;
+  public database = new TableDatabase(this.model);
+  public dataSource = new TableDataSource(this.database);
 
 
   public ngOnChanges() {
-    this.database = new TableDatabase(this.model);
-    this.dataSource = new TableDataSource(this.database);
+    this.database.update(this.model);
 
     const cols = [];
     for (let i = 0; i < this.columns.length; i++) {

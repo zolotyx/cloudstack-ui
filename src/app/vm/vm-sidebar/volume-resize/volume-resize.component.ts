@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit, Optional } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MD_DIALOG_DATA, MdDialogRef } from '@angular/material';
 import { DialogService } from '../../../dialog/dialog-service/dialog.service';
 import { DiskOffering } from '../../../shared/models';
@@ -6,6 +6,7 @@ import { Volume } from '../../../shared/models/volume.model';
 import { JobsNotificationService } from '../../../shared/services/jobs-notification.service';
 import { ResourceUsageService } from '../../../shared/services/resource-usage.service';
 import { VolumeResizeData, VolumeService } from '../../../shared/services/volume.service';
+import { StatsUpdateService } from '../../../shared/services/stats-update.service';
 
 
 @Component({
@@ -28,6 +29,7 @@ export class VolumeResizeComponent implements OnInit {
   constructor(
     public dialogRef: MdDialogRef<VolumeResizeComponent>,
     private dialogService: DialogService,
+    private statsUpdateService: StatsUpdateService,
     private jobsNotificationService: JobsNotificationService,
     private resourceUsageService: ResourceUsageService,
     private volumeService: VolumeService,
@@ -60,7 +62,8 @@ export class VolumeResizeComponent implements OnInit {
     );
 
     this.loading = true;
-    this.notificationId = this.jobsNotificationService.add('JOB_NOTIFICATIONS.VOLUME.RESIZE_IN_PROGRESS');
+    this.notificationId = this.jobsNotificationService.add(
+      'JOB_NOTIFICATIONS.VOLUME.RESIZE_IN_PROGRESS');
     this.volumeService.resize(params)
       .finally(() => this.loading = false)
       .subscribe(
@@ -91,6 +94,7 @@ export class VolumeResizeComponent implements OnInit {
   }
 
   private onVolumeResize(volume: Volume): void {
+    this.statsUpdateService.next();
     this.jobsNotificationService.finish({
       id: this.notificationId,
       message: 'JOB_NOTIFICATIONS.VOLUME.RESIZE_DONE'

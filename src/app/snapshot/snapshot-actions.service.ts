@@ -15,6 +15,7 @@ import { TemplateCreationComponent } from '../template/template-creation/templat
 export interface SnapshotAction extends Action<Snapshot> {
   name: string;
   icon: string;
+
   activate(snapshot: Snapshot, volume?: Volume): Observable<void>;
 }
 
@@ -44,7 +45,8 @@ export class SnapshotActionsService implements ActionsService<Snapshot, Snapshot
     private notificationService: NotificationService,
     private snapshotService: SnapshotService,
     private statsUpdateService: StatsUpdateService
-  ) { }
+  ) {
+  }
 
   public showCreationDialog(snapshot: Snapshot): Observable<void> {
     return this.dialog.open(TemplateCreationComponent, {
@@ -62,9 +64,12 @@ export class SnapshotActionsService implements ActionsService<Snapshot, Snapshot
     let notificationId: string;
 
     return this.dialogService.confirm({ message: 'DIALOG_MESSAGES.SNAPSHOT.CONFIRM_DELETION' })
+      .filter(_ => !!_)
       .switchMap(() => {
         snapshot['loading'] = true;
-        notificationId = this.jobNotificationService.add('JOB_NOTIFICATIONS.SNAPSHOT.DELETION_IN_PROGRESS');
+        notificationId = this.jobNotificationService.add(
+          'JOB_NOTIFICATIONS.SNAPSHOT.DELETION_IN_PROGRESS'
+        );
         return this.snapshotService.remove(snapshot.id);
       })
       .finally(() => snapshot['loading'] = false)
