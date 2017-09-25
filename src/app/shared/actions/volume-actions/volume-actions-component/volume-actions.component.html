@@ -3,7 +3,7 @@
     md-menu-item
     *ngIf="!action.hidden(volume)"
     (click)="onAction(action, volume)"
-    [disabled]="!diskOfferings"
+    [disabled]="!diskOfferings || !action.canActivate(volume)"
   >
     <md-icon>{{ action.icon }}</md-icon>
     <span>{{ action.name | translate }}</span>

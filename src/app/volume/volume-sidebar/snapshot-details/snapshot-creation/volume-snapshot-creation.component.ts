@@ -14,7 +14,7 @@ export class VolumeSnapshotCreationComponent {
   constructor(private volumeSnapshotAction: VolumeSnapshotAction) {}
 
   public get isVolumeReady(): boolean {
-    return this.volume && this.volume.state === VolumeState.Ready;
+    return this.volume && this.volume.isReady;
   }
 
   public addSnapshot(): void {

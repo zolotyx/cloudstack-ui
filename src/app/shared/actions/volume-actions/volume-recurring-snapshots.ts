@@ -16,4 +16,8 @@ export class VolumeRecurringSnapshotsAction extends VolumeAction {
     })
       .afterClosed();
   }
+
+  public canActivate(volume: Volume): boolean {
+    return volume.isReady;
+  }
 }

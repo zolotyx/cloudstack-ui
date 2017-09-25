@@ -92,6 +92,10 @@ export class Volume extends BaseModel {
     );
   }
 
+  public get isReady(): boolean {
+    return this.state === VolumeState.Ready;
+  }
+
   private initializeTags(): void {
     if (!this.tags) {
       this.tags = [];

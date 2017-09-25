@@ -18,4 +18,8 @@ export class VolumeSnapshotAction extends VolumeAction {
     })
       .afterClosed();
   }
+
+  public canActivate(volume: Volume): boolean {
+    return volume.isReady;
+  }
 }
