@@ -2,23 +2,37 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { SecurityGroup } from '../../../security-group/sg.model';
-import {
-  AffinityGroup,
-  AffinityGroupType
-} from '../../../shared/models';
+import { AffinityGroup, AffinityGroupType } from '../../../shared/models';
 import { AffinityGroupService } from '../../../shared/services/affinity-group.service';
 import { InstanceGroupService } from '../../../shared/services/instance-group.service';
 import { TagService } from '../../../shared/services/tags/tag.service';
 import { VirtualMachineTagKeys } from '../../../shared/services/tags/vm-tag-keys';
-import {
-  VirtualMachine,
-  VmState
-} from '../../shared/vm.model';
+import { VirtualMachine, VmState } from '../../shared/vm.model';
 import { VmService } from '../../shared/vm.service';
-import { VmCreationState } from '../data/vm-creation-state';
+import { NotSelected, VmCreationState } from '../data/vm-creation-state';
 import { VmCreationSecurityGroupService } from './vm-creation-security-group.service';
 import { UserTagService } from '../../../shared/services/tags/user-tag.service';
 import { VmTagService } from '../../../shared/services/tags/vm-tag.service';
+import { NetworkRule } from '../../../security-group/network-rule.model';
+
+interface VmCreationParams {
+  affinityGroupNames?: string;
+  details?: Array<any>;
+  diskofferingid?: string;
+  startVm?: string;
+  hypervisor?: string;
+  ingress?: Array<NetworkRule>;
+  egress?: Array<NetworkRule>;
+  keyboard?: string;
+  keyPair?: string;
+  name?: string;
+  securityGroupIds?: string;
+  serviceOfferingId?: string;
+  rootDiskSize?: number;
+  size?: number;
+  templateId?: string;
+  zoneId?: string;
+}
 
 export enum VmDeploymentStage {
   STARTED = 'STARTED',
@@ -126,7 +140,7 @@ export class VmDeploymentService {
     state: VmCreationState,
     vm: VirtualMachine
   ): Observable<any> {
-    if (!state.doCreateInstanceGroup) {
+    if (!(state.instanceGroup && state.instanceGroup.name)) {
       return Observable.of(null);
     }
 
@@ -193,7 +207,8 @@ export class VmDeploymentService {
     deployObservable: Subject<VmDeploymentMessage>,
     state: VmCreationState
   ): Observable<AffinityGroup> {
-    if (!state.doCreateAffinityGroup) {
+    if (!(state.affinityGroup && state.affinityGroup.name) ||
+      state.affinityGroupNames.includes(state.affinityGroup.name)) {
       return Observable.of(null);
     }
 
@@ -220,7 +235,7 @@ export class VmDeploymentService {
     deployObservable: Subject<VmDeploymentMessage>,
     state: VmCreationState
   ): Observable<SecurityGroup[]> {
-    if (!state.doCreateSecurityGroup) {
+    if (!(state.zone && !state.zone.networkTypeIsBasic)) {
       return Observable.of(null);
     }
 
@@ -246,7 +261,7 @@ export class VmDeploymentService {
     deployObservable: Subject<VmDeploymentMessage>,
     state: VmCreationState
   ): Observable<{ deployResponse: any, temporaryVm: VirtualMachine }> {
-    const params = state.getVmCreationParams();
+    const params = this.getVmCreationParams(state);
     let deployResponse;
     let temporaryVm;
 
@@ -303,5 +318,59 @@ export class VmDeploymentService {
       stage: VmDeploymentStage.ERROR,
       error
     });
+  }
+
+  private getVmCreationParams(state) {
+    const params: VmCreationParams = {};
+
+    if (state.affinityGroup) {
+      params.affinityGroupNames = state.affinityGroup.name;
+    }
+
+    params.startVm = state.doStartVm;
+    params.keyboard = state.keyboard;
+    params.name = state.displayName || state.defaultName;
+    params.serviceOfferingId = state.serviceOffering.id;
+    params.templateId = state.template.id;
+    params.zoneId = state.zone.id;
+
+    if (state.sshKeyPair && !(state.sshKeyPair as NotSelected).ignore) {
+      params.keyPair = state.sshKeyPair.name;
+    }
+
+    if (state.diskOffering && !state.template.isTemplate) {
+      params.diskofferingid = state.diskOffering.id;
+      params.hypervisor = 'KVM';
+    }
+
+    if (
+      state.securityGroupData &&
+      state.securityGroupData.securityGroups &&
+      state.securityGroupData.securityGroups.length &&
+      state.securityGroupData.securityGroups[0].id
+    ) {
+      params.securityGroupIds = state.securityGroupData.securityGroups.map(item => item.id).join(','); // @todo
+    }
+
+    if (state.serviceOffering.areCustomParamsSet) {
+      params.details = [
+        {
+          cpuNumber: state.serviceOffering.cpuNumber,
+          cpuSpeed: state.serviceOffering.cpuSpeed,
+          memory: state.serviceOffering.memory
+        }
+      ];
+    }
+
+    if ((state.rootDiskSize != null && state.template.isTemplate) ||
+      (state.diskOffering && state.diskOffering.isCustomized)) {
+      if (state.template.isTemplate) {
+        params.rootDiskSize = state.rootDiskSize;
+      } else {
+        params.size = state.rootDiskSize;
+      }
+    }
+
+    return params;
   }
 }

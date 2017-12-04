@@ -1,9 +1,9 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
-import { ServiceOffering } from '../../../shared/models/service-offering.model';
 import { OfferingAvailability } from '../../../shared/services/offering.service';
 import { ResourceStats } from '../../../shared/services/resource-usage.service';
 import { Zone } from '../../../shared/models/zone.model';
+import { ServiceOffering } from '../../../shared/models/service-offering.model';
 import {
   CustomServiceOffering,
   ICustomServiceOffering
@@ -19,7 +19,7 @@ import {
   customServiceOfferingFallbackParams
 } from '../../../service-offering/custom-service-offering/service/custom-service-offering.service';
 
-import * as event from './service-offerings.actions';
+import * as serviceOfferingActions from './service-offerings.actions';
 import * as fromVMs from '../../vm/redux/vm.reducers';
 import * as fromAuths from '../../auth/redux/auth.reducers';
 import * as fromZones from '../../zones/redux/zones.reducers';
@@ -74,16 +74,16 @@ export const initialState: State = adapter.getInitialState({
 
 export function reducer(
   state = initialState,
-  action: event.Actions
+  action: serviceOfferingActions.Actions
 ): State {
   switch (action.type) {
-    case event.LOAD_SERVICE_OFFERINGS_REQUEST: {
+    case serviceOfferingActions.LOAD_SERVICE_OFFERINGS_REQUEST: {
       return {
         ...state,
         loading: true
       };
     }
-    case event.LOAD_SERVICE_OFFERINGS_RESPONSE: {
+    case serviceOfferingActions.LOAD_SERVICE_OFFERINGS_RESPONSE: {
 
       const offerings = action.payload;
 
@@ -100,21 +100,21 @@ export function reducer(
       };
     }
 
-    case event.LOAD_OFFERING_AVAILABILITY_RESPONSE: {
+    case serviceOfferingActions.LOAD_OFFERING_AVAILABILITY_RESPONSE: {
       return {
         ...state,
         offeringAvailability: action.payload
       };
     }
 
-    case event.LOAD_CUSTOM_RESTRICTION_RESPONSE: {
+    case serviceOfferingActions.LOAD_CUSTOM_RESTRICTION_RESPONSE: {
       return {
         ...state,
         customOfferingRestrictions: action.payload
       };
     }
 
-    case event.LOAD_DEFAULT_PARAMS_RESPONSE: {
+    case serviceOfferingActions.LOAD_DEFAULT_PARAMS_RESPONSE: {
       return {
         ...state,
         defaultParams: action.payload
@@ -201,7 +201,7 @@ export const getAvailableOfferings = createSelector(
           ? offering
           : getCustomOfferingWithSetParams(
             offering,
-            defaultParams[zone.id] && defaultParams[zone.id].customOfferingParams,
+            defaults[zone.id] && defaults[zone.id].customOfferingParams,
             customOfferingRestrictions[zone.id],
             ResourceStats.fromAccount([user])
           );

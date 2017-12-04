@@ -163,14 +163,14 @@ import { EffectsModule } from '@ngrx/effects';
 import { AccountUserActionsComponent } from './actions/account-user-actions/account-user-actions.component';
 import { AccountUserActionsService } from './actions/account-user-actions/account-user-actions.service';
 import { AccountUserService } from './services/account-user.service';
-import {
-  TemplateActionsContainerComponent
-} from './actions/template-actions/template-actions-component/template-actions.container';
+// tslint:disable-next-line
+import { TemplateActionsContainerComponent } from './actions/template-actions/template-actions-component/template-actions.container';
 import { VmStatisticContainerComponent } from './components/vm-statistics/vm-statistic.container';
-import {
-  VolumeAttachmentContainerComponent
-} from './actions/volume-actions/volume-attachment/volume-attachment.container';
+// tslint:disable-next-line
+import { VolumeAttachmentContainerComponent } from './actions/volume-actions/volume-attachment/volume-attachment.container';
 import { VolumeAttachmentComponent } from './actions/volume-actions/volume-attachment/volume-attachment.component';
+import { affinityGroupReducers } from '../reducers/affinity-groups/redux/affinity-groups.reducers';
+import { AffinityGroupsEffects } from '../reducers/affinity-groups/redux/affinity-groups.effects';
 
 @NgModule({
   imports: [
@@ -207,7 +207,8 @@ import { VolumeAttachmentComponent } from './actions/volume-actions/volume-attac
     MatButtonToggleModule,
     StoreModule.forFeature('zones', zoneReducers),
     StoreModule.forFeature('disk-offerings', diskOfferingReducers),
-    EffectsModule.forFeature([ZonesEffects, DiskOfferingEffects]),
+    StoreModule.forFeature('affinity-groups', affinityGroupReducers),
+    EffectsModule.forFeature([ZonesEffects, DiskOfferingEffects, AffinityGroupsEffects]),
   ],
   exports: [
     CdkTableModule,
