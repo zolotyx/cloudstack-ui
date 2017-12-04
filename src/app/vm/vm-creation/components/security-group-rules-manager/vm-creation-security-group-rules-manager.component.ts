@@ -4,9 +4,10 @@ import { MatDialog } from '@angular/material';
 import { Rules } from '../../../../shared/components/security-group-builder/rules';
 import { VmCreationSecurityGroupData } from '../../security-group/vm-creation-security-group-data';
 import { VmCreationSecurityGroupMode } from '../../security-group/vm-creation-security-group-mode';
-import { VmCreationSecurityGroupComponent } from '../security-group/vm-creation-security-group.component';
-import * as cloneDeep from 'lodash/cloneDeep';
+// tslint:disable-next-line
+import { VmCreationSecurityGroupContainerComponent } from '../security-group/containers/vm-creation-security-group.container';
 
+import * as cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'cs-vm-creation-security-group-rules-manager',
@@ -29,7 +30,8 @@ export class VmCreationSecurityGroupRulesManagerComponent implements ControlValu
     this.savedData = VmCreationSecurityGroupData.fromRules(new Rules());
   }
 
-  public propagateChange: any = () => {};
+  public propagateChange: any = () => {
+  };
 
   @Input()
   public get securityGroupRulesManagerData(): VmCreationSecurityGroupData {
@@ -49,14 +51,17 @@ export class VmCreationSecurityGroupRulesManagerComponent implements ControlValu
     this.propagateChange = fn;
   }
 
-  public registerOnTouched(): void { }
+  public registerOnTouched(): void {
+  }
 
   public get isModeNew(): boolean {
-    return this.savedData && this.savedData.mode === VmCreationSecurityGroupMode.Builder;
+    return this.securityGroupRulesManagerData
+      && this.securityGroupRulesManagerData.mode === VmCreationSecurityGroupMode.Builder;
   }
 
   public get isModeExisting(): boolean {
-    return this.savedData && this.savedData.mode === VmCreationSecurityGroupMode.Selector;
+    return this.securityGroupRulesManagerData
+      && this.securityGroupRulesManagerData.mode === VmCreationSecurityGroupMode.Selector;
   }
 
   public get showAddButton(): boolean {
@@ -66,31 +71,33 @@ export class VmCreationSecurityGroupRulesManagerComponent implements ControlValu
   public get showEditButton(): boolean {
     return (
       (this.isModeNew &&
-        this.savedData &&
-        this.savedData.rules &&
-        this.savedData.rules.templates &&
-        !!this.savedData.rules.templates.length) ||
-      (this.isModeExisting && this.savedData && !!this.savedData.securityGroups)
+        this.securityGroupRulesManagerData &&
+        this.securityGroupRulesManagerData.rules &&
+        this.securityGroupRulesManagerData.rules.templates &&
+        !!this.securityGroupRulesManagerData.rules.templates.length) ||
+      (this.isModeExisting &&
+        this.securityGroupRulesManagerData &&
+        this.securityGroupRulesManagerData.securityGroups &&
+        !!this.securityGroupRulesManagerData.securityGroups.length)
     );
   }
 
   public showDialog(): void {
-    const data = cloneDeep(this.savedData);
-    this.dialog.open(VmCreationSecurityGroupComponent, {
+    const data = cloneDeep(this.securityGroupRulesManagerData);
+    this.dialog.open(VmCreationSecurityGroupContainerComponent, {
       width: '800px',
       data
     })
       .afterClosed()
-      .subscribe((data: any) => {
-        if (data) {
-          this.updateData(data);
+      .subscribe((res: any) => {
+        if (res) {
+          this.updateData(res);
         }
       });
   }
 
   private updateData(data: VmCreationSecurityGroupData): void {
-    this.savedData = data;
-    this.securityGroupRulesManagerData = this.savedData;
+    this.securityGroupRulesManagerData = data;
   }
 }
 

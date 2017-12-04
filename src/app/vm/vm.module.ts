@@ -122,6 +122,8 @@ import { DiskOfferingContainerComponent } from './vm-creation/containers/disk-of
 // tslint:disable-next-line
 import { VmCreationSshKeySelectorContainerComponent } from './vm-creation/ssh-key-selector/containers/ssh-key-selector.container';
 import { VmCreationSshKeySelectorComponent } from './vm-creation/ssh-key-selector/ssh-key-selector.component';
+// tslint:disable-next-line
+import { VmCreationSecurityGroupContainerComponent } from './vm-creation/components/security-group/containers/vm-creation-security-group.container';
 
 @NgModule({
   imports: [
@@ -219,7 +221,7 @@ import { VmCreationSshKeySelectorComponent } from './vm-creation/ssh-key-selecto
     SnapshotCreationComponent,
     SnapshotModalComponent,
     SnapshotModalContainerComponent,
-    // VmCreationSecurityGroupContainerComponent,
+    VmCreationSecurityGroupContainerComponent,
     VmCreationSecurityGroupComponent,
     SecurityGroupManagerExistingGroupComponent,
     VmCreationSecurityGroupRulesManagerComponent,
@@ -250,7 +252,7 @@ import { VmCreationSshKeySelectorComponent } from './vm-creation/ssh-key-selecto
     SnapshotModalContainerComponent,
     VolumeAttachmentDialogComponent,
     SshKeypairResetComponent,
-    // VmCreationSecurityGroupContainerComponent,
+    VmCreationSecurityGroupContainerComponent,
     PostdeploymentComponent,
     VmResetPasswordComponent,
     VmAccessComponent,
