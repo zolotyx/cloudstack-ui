@@ -202,7 +202,7 @@
             <h5>{{ 'VM_PAGE.VM_CREATION.KEYBOARD_LAYOUT' | translate }}</h5>
             <cs-keyboards
               name="keyboard"
-              [ngModel]="vmCreationState.state.keyboard?.value"
+              [ngModel]="vmCreationState.state.keyboard"
               (ngModelChange)="keyboardChange.emit($event)"
             ></cs-keyboards>
           </div>

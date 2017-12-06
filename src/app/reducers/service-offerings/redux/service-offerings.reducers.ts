@@ -210,6 +210,49 @@ export const getAvailableOfferings = createSelector(
   }
 );
 
+export const getAvailableOfferingsForVmCreation = createSelector(selectAll,
+  offeringAvailability,
+  defaultParams,
+  customOfferingRestrictions,
+  fromVMs.getVmCreationZoneId,
+  fromZones.selectEntities,
+  fromAuths.getUserAccount,
+  (
+    serviceOfferings, availability,
+    defaults, customRestrictions,
+    zoneId, zones, user
+  ) => {
+    const zone = zones && zones[zoneId];
+    if (zone && user) {
+      const availableOfferings = getAvailableByResourcesSync(
+        serviceOfferings,
+        availability,
+        customRestrictions,
+        ResourceStats.fromAccount([user]),
+        zone
+      ).sort((a: ServiceOffering, b: ServiceOffering) => {
+        if (!a.isCustomized && b.isCustomized) {
+          return -1;
+        }
+        if (a.isCustomized && !b.isCustomized) {
+          return 1;
+        }
+        return 0;
+      });
+
+      return availableOfferings.map((offering) => {
+        return !offering.isCustomized
+          ? offering
+          : getCustomOfferingWithSetParams(
+            offering,
+            defaults[zone.id] && defaults[zone.id].customOfferingParams,
+            customOfferingRestrictions[zone.id],
+            ResourceStats.fromAccount([user])
+          );
+      });
+    }
+  });
+
 const getOfferingsAvailableInZone = (
   offeringList: Array<ServiceOffering>,
   availability: OfferingAvailability,
