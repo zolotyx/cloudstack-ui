@@ -37,6 +37,7 @@ export class VmCreationComponent {
   @Input() public zones: Zone[];
   @Input() public serviceOfferings: ServiceOffering[];
   @Input() public customOfferingRestrictions: ICustomOfferingRestrictions;
+  @Input() public serviceOfferingsAreLoading: boolean;
 
   @Input() public fetching: boolean;
   @Input() public showOverlay: boolean;
@@ -63,6 +64,7 @@ export class VmCreationComponent {
   @Output() public onVmDeploymentFinish = new EventEmitter<VirtualMachine>();
   @Output() public onVmDeploymentFailed = new EventEmitter();
   @Output() public deploy = new EventEmitter<FormState>();
+  @Output() public cancel = new EventEmitter();
 
 
   public insufficientResourcesErrorMap = {
