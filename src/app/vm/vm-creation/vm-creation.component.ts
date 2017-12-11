@@ -9,10 +9,13 @@ import { NotSelected } from './data/vm-creation-state';
 import { VmCreationSecurityGroupData } from './security-group/vm-creation-security-group-data';
 import { VmCreationAgreementComponent } from './template/agreement/vm-creation-agreement.component';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+// tslint:disable-next-line
 import { ICustomOfferingRestrictions } from '../../service-offering/custom-service-offering/custom-offering-restrictions';
+// tslint:disable-next-line
 import { ProgressLoggerMessage, } from '../../shared/components/progress-logger/progress-logger-message/progress-logger-message';
 import { VmCreationContainerComponent } from './containers/vm-creation.container';
 import { FormState } from '../../reducers/vm/redux/vm.reducers';
+import { AuthService } from '../../shared/services/auth.service';
 
 import * as clone from 'lodash/clone';
 
@@ -31,7 +34,6 @@ import * as clone from 'lodash/clone';
 export class VmCreationComponent {
   @Input() public account: Account;
   @Input() public vmCreationState: FormState;
-  @Input() public isLoading = false;
   @Input() public instanceGroupList: InstanceGroup[];
   @Input() public affinityGroupList: AffinityGroup[];
   @Input() public zones: Zone[];
@@ -105,11 +107,16 @@ export class VmCreationComponent {
     return this.vmCreationState.state.diskOffering && this.vmCreationState.state.diskOffering.isCustomized;
   }
 
-  public get securityGroupsAreAllowed(): boolean {
-    return this.vmCreationState.state.zone && !this.vmCreationState.state.zone.networkTypeIsBasic;
+  public get showSecurityGroups(): boolean {
+    return this.vmCreationState.state.zone
+      && this.vmCreationState.state.zone.securitygroupsenabled
+      && this.auth.isSecurityGroupEnabled();
   }
 
-  constructor(public dialogRef: MatDialogRef<VmCreationContainerComponent>) {
+  constructor(
+    public dialogRef: MatDialogRef<VmCreationContainerComponent>,
+    private auth: AuthService
+  ) {
   }
 
   public changeTemplate(value: BaseTemplateModel) {

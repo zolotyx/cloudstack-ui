@@ -1,20 +1,15 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
-import { OfferingAvailability } from '../../../shared/services/offering.service';
-import { ResourceStats } from '../../../shared/services/resource-usage.service';
-import { Zone } from '../../../shared/models/zone.model';
 import { ServiceOffering } from '../../../shared/models/service-offering.model';
 import {
   CustomServiceOffering,
   ICustomServiceOffering
 } from '../../../service-offering/custom-service-offering/custom-service-offering';
 import {
+  DefaultCustomServiceOfferingRestrictions,
   ICustomOfferingRestrictions,
   ICustomOfferingRestrictionsByZone
 } from '../../../service-offering/custom-service-offering/custom-offering-restrictions';
-import {
-  DefaultCustomServiceOfferingRestrictions
-} from '../../../service-offering/custom-service-offering/custom-service-offering.component';
 import {
   customServiceOfferingFallbackParams
 } from '../../../service-offering/custom-service-offering/service/custom-service-offering.service';
@@ -46,6 +41,10 @@ export interface OfferingsState {
 export const serviceOfferingReducers = {
   list: reducer,
 };
+
+// export const sortServiceOfferings = (a: ServiceOffering, b: ServiceOffering) = {
+//   return 0;
+// }
 
 /**
  * createEntityAdapter creates many an object of helper
@@ -250,6 +249,8 @@ export const getAvailableOfferingsForVmCreation = createSelector(selectAll,
             ResourceStats.fromAccount([user])
           );
       });
+    } else {
+      return []
     }
   });
 
