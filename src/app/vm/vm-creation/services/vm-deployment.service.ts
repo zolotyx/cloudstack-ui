@@ -242,7 +242,7 @@ export class VmDeploymentService {
       .map(() => ({ deployResponse, temporaryVm }));
   }
 
-  private handleTemporaryVm(
+  public handleTemporaryVm(
     temporaryVm: VirtualMachine,
     deployObservable: Subject<VmDeploymentMessage>
   ): void {
@@ -278,7 +278,7 @@ export class VmDeploymentService {
     });
   }
 
-  private getVmCreationParams(state) {
+  public getVmCreationParams(state) {
     const params: VmCreationParams = {};
 
     if (state.affinityGroup) {
