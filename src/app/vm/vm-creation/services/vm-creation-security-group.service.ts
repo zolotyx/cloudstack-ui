@@ -13,6 +13,7 @@ export class VmCreationSecurityGroupService {
   constructor(private securityGroupService: SecurityGroupService) {}
 
   public getSecurityGroupCreationRequest(securityGroupData: VmCreationSecurityGroupData): Observable<any> {
+    debugger;
     if (securityGroupData.mode === VmCreationSecurityGroupMode.Builder) {
       const data = this.securityGroupCreationData;
       const rules = this.getSecurityGroupCreationRules(securityGroupData.rules);
