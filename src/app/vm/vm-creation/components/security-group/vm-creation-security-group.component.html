@@ -1,41 +1,42 @@
 <h3 class="mat-dialog-title">
-  {{ title[displayMode] | translate }}
+  {{ title[savedData.mode] | translate }}
 </h3>
 
 <div class="mat-dialog-content">
   <mat-button-toggle-group
-    name="displayMode"
-    [(ngModel)]="displayMode"
+    [(ngModel)]="savedData.mode"
   >
-    <mat-button-toggle value="0" [value]="VmCreationSecurityGroupMode.Builder">
+    <mat-button-toggle [value]="VmCreationSecurityGroupMode.Builder">
       {{ 'SECURITY_GROUP_SELECTOR.CREATE' | translate }}
     </mat-button-toggle>
-    <mat-button-toggle value="1" [value]="VmCreationSecurityGroupMode.Selector">
+    <mat-button-toggle [value]="VmCreationSecurityGroupMode.Selector">
       {{ 'SECURITY_GROUP_SELECTOR.SELECT_SHARED' | translate }}
     </mat-button-toggle>
   </mat-button-toggle-group>
 
   <cs-security-group-builder
-    *ngIf="displayMode === VmCreationSecurityGroupMode.Builder"
-    [inputRules]="savedData.rules"
+    *ngIf="isModeBuilder"
+    [inputRules]="savedData?.rules"
     (onChange)="onBuilderGroupChange($event)"
   ></cs-security-group-builder>
 
   <cs-security-group-selector
-    *ngIf="displayMode === VmCreationSecurityGroupMode.Selector && sharedGroups"
+    *ngIf="isModeSelector && sharedGroups"
     [securityGroups]="sharedGroups"
-    [ngModel]="savedData.securityGroups"
-    (ngModelChange)="onSecurityGroupChange($event)"
+    [(ngModel)]="savedData.securityGroups"
   ></cs-security-group-selector>
 </div>
+
 <div class="mat-dialog-actions">
-  <button mat-button (click)="onCancel()">
+  <button mat-button (click)="onCancel.emit()">
     {{ 'COMMON.CANCEL' | translate }}
   </button>
+
   <button
     mat-button
-    [disabled]="!savedData.rules?.templates.length && !savedData.securityGroups?.length"
-    (click)="onSave()"
+    [disabled]="(isModeBuilder && !savedData.rules?.templates?.length)
+     || (isModeSelector && !savedData.securityGroups?.length)"
+    (click)="onSave.emit(savedData)"
   >
     {{ 'COMMON.SAVE' | translate }}
   </button>

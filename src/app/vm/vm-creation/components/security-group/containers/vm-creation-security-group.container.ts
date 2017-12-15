@@ -1,8 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { State } from '../../../../../reducers';
 import { Store } from '@ngrx/store';
-// tslint:disable-next-line
+import { State } from '../../../../../reducers/vm/redux/vm.reducers';
 import { VmCreationSecurityGroupData } from '../../../security-group/vm-creation-security-group-data';
 
 import * as fromSecurityGroups from '../../../../../reducers/security-groups/redux/sg.reducers';
@@ -14,11 +13,12 @@ import * as securityGroupActions from '../../../../../reducers/security-groups/r
     <cs-vm-creation-security-group
       [sharedGroups]="sharedGroups$ | async"
       [savedData]="savedData"
-      (close)="onClose($event)"
+      (onSave)="onSave($event)"
+      (onCancel)="onCancel()"
     ></cs-vm-creation-security-group>`
 })
 export class VmCreationSecurityGroupContainerComponent {
-  readonly sharedGroups$ = this.store.select(fromSecurityGroups.selectSecurityGroupsForVmCreation);
+  public sharedGroups$ = this.store.select(fromSecurityGroups.selectSecurityGroupsForVmCreation);
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public savedData: VmCreationSecurityGroupData,
@@ -28,7 +28,11 @@ export class VmCreationSecurityGroupContainerComponent {
     this.store.dispatch(new securityGroupActions.LoadSecurityGroupRequest());
   }
 
-  public onClose(data: VmCreationSecurityGroupData) {
-    this.dialogRef.close(data);
+  public onSave(savedData: VmCreationSecurityGroupData): void {
+    this.dialogRef.close(savedData);
+  }
+
+  public onCancel(): void {
+    this.dialogRef.close();
   }
 }
